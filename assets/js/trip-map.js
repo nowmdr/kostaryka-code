@@ -1,9 +1,9 @@
 /**
- * Kostaryka Trip Map - JavaScript
- * Version: 1.0.0
+ * Kostaryka Trip Map - JavaScript (Vanilla JS)
+ * Version: 1.1.0
  */
 
-(function ($) {
+(function () {
   "use strict";
 
   // Zmienne globalne
@@ -14,7 +14,7 @@
   /**
    * Inicjalizacja po załadowaniu DOM
    */
-  $(document).ready(function () {
+  document.addEventListener("DOMContentLoaded", function () {
     initTripMapButtons();
   });
 
@@ -23,34 +23,37 @@
    */
   function initTripMapButtons() {
     // Event delegation dla przycisków (div.trip-preview-btn lub button wewnątrz)
-    $(document).on("click", ".trip-preview-btn, .trip-preview-btn button", handleButtonClick);
+    document.addEventListener("click", function (e) {
+      const button = e.target.closest(".trip-preview-btn, .trip-preview-btn button");
+      if (!button) return;
+      handleButtonClick(e, button);
+    });
 
-    console.log("Kostaryka Trip Map initialized");
+    console.log("Kostaryka Trip Map initialized (Vanilla JS)");
   }
 
   /**
    * Obsługa kliknięcia w przycisk
    */
-  function handleButtonClick(e) {
+  async function handleButtonClick(e, clickedElement) {
     e.preventDefault();
 
-    // Находим контейнер .trip-preview-btn (может быть this или родитель)
-    const $wrapper = $(this).hasClass("trip-preview-btn")
-      ? $(this)
-      : $(this).closest(".trip-preview-btn");
+    // Находим контейнер .trip-preview-btn (может быть clickedElement или родитель)
+    const wrapper = clickedElement.classList.contains("trip-preview-btn")
+      ? clickedElement
+      : clickedElement.closest(".trip-preview-btn");
 
     // Ищем ссылку на пост в этой же карточке
-    const $postLink = $wrapper
-      .closest(".bde-loop-item")
-      .find('a[href*="/oferta/"]');
+    const loopItem = wrapper.closest(".bde-loop-item");
+    const postLink = loopItem ? loopItem.querySelector('a[href*="/oferta/"]') : null;
 
-    if (!$postLink.length) {
+    if (!postLink) {
       console.error("Could not find post link");
       alert("Nie można znaleźć linku do wyprawy.");
       return;
     }
 
-    const postUrl = $postLink.attr("href");
+    const postUrl = postLink.getAttribute("href");
     const urlParts = postUrl.split("/").filter(Boolean);
     const postSlug = urlParts[urlParts.length - 1];
 
@@ -58,70 +61,75 @@
     console.log("Fetching post ID from WordPress API...");
 
     // Pobieramy ID postu przez REST API
-    $.ajax({
-      url: "/wp-json/wp/v2/oferta",
-      type: "GET",
-      data: {
-        slug: postSlug,
-        _fields: "id", // Tylko ID, żeby było szybciej
-      },
-      success: function (posts) {
-        if (posts && posts.length > 0) {
-          const tripId = posts[0].id;
-          console.log("Found post ID:", tripId);
-          loadTripLocations(tripId);
-        } else {
-          console.error("Post not found by slug:", postSlug);
-          alert("Nie można znaleźć wyprawy.");
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("API Error:", error);
-        alert("Błąd podczas pobierania danych wyprawy.");
-      },
-    });
+    try {
+      const response = await fetch(
+        `/wp-json/wp/v2/oferta?slug=${encodeURIComponent(postSlug)}&_fields=id`
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const posts = await response.json();
+
+      if (posts && posts.length > 0) {
+        const tripId = posts[0].id;
+        console.log("Found post ID:", tripId);
+        loadTripLocations(tripId);
+      } else {
+        console.error("Post not found by slug:", postSlug);
+        alert("Nie można znaleźć wyprawy.");
+      }
+    } catch (error) {
+      console.error("API Error:", error);
+      alert("Błąd podczas pobierania danych wyprawy.");
+    }
   }
 
   /**
    * Ładowanie lokacji przez AJAX
    */
-  function loadTripLocations(tripId) {
+  async function loadTripLocations(tripId) {
     // Sprawdzenie czy tripMapData istnieje
     if (typeof tripMapData === "undefined") {
       console.error(
-        "tripMapData is not defined. Plugin may not be loaded correctly.",
+        "tripMapData is not defined. Plugin may not be loaded correctly."
       );
       showError("Błąd konfiguracji. Skontaktuj się z administratorem.");
       return;
     }
 
-    $.ajax({
-      url: tripMapData.ajaxUrl,
-      type: "POST",
-      data: {
-        action: "get_trip_locations",
-        trip_id: tripId,
-        nonce: tripMapData.nonce,
-      },
-      beforeSend: function () {
-        showLoader();
-      },
-      success: function (response) {
-        console.log("AJAX Response:", response);
+    showLoader();
 
-        if (response.success && response.data) {
-          renderLocationsList(response.data);
-          initMap(response.data);
-        } else {
-          const errorMsg = response.data || "Nie znaleziono lokacji";
-          showError(errorMsg);
-        }
-      },
-      error: function (xhr, status, error) {
-        console.error("AJAX Error:", error, xhr);
-        showError("Błąd połączenia. Spróbuj ponownie.");
-      },
-    });
+    try {
+      const formData = new FormData();
+      formData.append("action", "get_trip_locations");
+      formData.append("trip_id", tripId);
+      formData.append("nonce", tripMapData.nonce);
+
+      const response = await fetch(tripMapData.ajaxUrl, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const data = await response.json();
+      console.log("AJAX Response:", data);
+
+      if (data.success && data.data) {
+        renderLocationsList(data.data);
+        initMap(data.data);
+      } else {
+        const errorMsg = data.data || "Nie znaleziono lokacji";
+        showError(errorMsg);
+      }
+    } catch (error) {
+      console.error("AJAX Error:", error);
+      showError("Błąd połączenia. Spróbuj ponownie.");
+    }
   }
 
   /**
@@ -131,18 +139,24 @@
     const loaderHtml =
       '<div class="trip-map-loader" style="text-align:center; padding:40px;"><div class="spinner"></div><p>Ładowanie lokacji...</p></div>';
 
-    $("#locations-list").html(loaderHtml);
-    $("#map-container").html(loaderHtml);
+    const locationsList = document.getElementById("locations-list");
+    const mapContainer = document.getElementById("map-container");
+
+    if (locationsList) locationsList.innerHTML = loaderHtml;
+    if (mapContainer) mapContainer.innerHTML = loaderHtml;
   }
 
   /**
    * Pokazywanie błędu
    */
   function showError(message) {
-    const errorHtml = `<div class="trip-map-error" style="text-align:center; padding:40px; color:#d63638;"><p>${message}</p></div>`;
+    const errorHtml = `<div class="trip-map-error" style="text-align:center; padding:40px; color:#d63638;"><p>${escapeHtml(message)}</p></div>`;
 
-    $("#locations-list").html(errorHtml);
-    $("#map-container").html(errorHtml);
+    const locationsList = document.getElementById("locations-list");
+    const mapContainer = document.getElementById("map-container");
+
+    if (locationsList) locationsList.innerHTML = errorHtml;
+    if (mapContainer) mapContainer.innerHTML = errorHtml;
   }
 
   /**
@@ -173,27 +187,40 @@
         html += "</div></div>";
       });
 
-      html += '</div>';
+      html += "</div>";
     }
 
     html += "</div>";
-    $("#locations-list").html(html);
 
-    // Event handler dla kliknięcia w lokację
-    $(".location-item").on("click", function () {
-      const index = $(this).data("index");
+    const locationsList = document.getElementById("locations-list");
+    if (locationsList) {
+      locationsList.innerHTML = html;
+    }
 
-      // Usuń active ze wszystkich
-      $(".location-item").removeClass("active");
-      // Dodaj do klikniętego
-      $(this).addClass("active");
+    // Event delegation dla kliknięcia w lokację (na kontenerze)
+    if (locationsList) {
+      locationsList.addEventListener("click", function (e) {
+        const locationItem = e.target.closest(".location-item");
+        if (!locationItem) return;
 
-      // Focus na markerze
-      if (markers[index]) {
-        markers[index].openPopup();
-        map.setView(markers[index].getLatLng(), 10);
-      }
-    });
+        const index = parseInt(locationItem.dataset.index, 10);
+
+        // Usuń active ze wszystkich
+        const allItems = locationsList.querySelectorAll(".location-item");
+        allItems.forEach(function (item) {
+          item.classList.remove("active");
+        });
+
+        // Dodaj do klikniętego
+        locationItem.classList.add("active");
+
+        // Focus na markerze
+        if (markers[index]) {
+          markers[index].openPopup();
+          map.setView(markers[index].getLatLng(), 10);
+        }
+      });
+    }
   }
 
   /**
@@ -215,7 +242,10 @@
     markers = [];
 
     // Wyczyść kontener
-    $("#map-container").empty();
+    const mapContainer = document.getElementById("map-container");
+    if (mapContainer) {
+      mapContainer.innerHTML = "";
+    }
 
     // Filtruj tylko lokacje ze współrzędnymi
     const locationsWithCoords = locations.filter(function (loc) {
@@ -223,9 +253,10 @@
     });
 
     if (locationsWithCoords.length === 0) {
-      $("#map-container").html(
-        '<p style="text-align:center; padding:40px; color:#666;">Brak lokacji z podanymi współrzędnymi.</p>',
-      );
+      if (mapContainer) {
+        mapContainer.innerHTML =
+          '<p style="text-align:center; padding:40px; color:#666;">Brak lokacji z podanymi współrzędnymi.</p>';
+      }
       return;
     }
 
@@ -250,7 +281,7 @@
       // Dodaj markery
       locationsWithCoords.forEach(function (loc, index) {
         const marker = L.marker([loc.latitude, loc.longitude]).bindPopup(
-          createPopupContent(loc),
+          createPopupContent(loc)
         );
 
         marker.addTo(markersLayer);
@@ -294,7 +325,7 @@
    * Escape HTML dla bezpieczeństwa
    */
   function escapeHtml(text) {
-    const map = {
+    const htmlMap = {
       "&": "&amp;",
       "<": "&lt;",
       ">": "&gt;",
@@ -302,7 +333,7 @@
       "'": "&#039;",
     };
     return String(text).replace(/[&<>"']/g, function (m) {
-      return map[m];
+      return htmlMap[m];
     });
   }
 
@@ -313,16 +344,13 @@
     console.log("=== KOSTARYKA TRIP MAP DEBUG ===");
     console.log(
       "tripMapData:",
-      typeof tripMapData !== "undefined" ? tripMapData : "NOT LOADED",
+      typeof tripMapData !== "undefined" ? tripMapData : "NOT LOADED"
     );
     console.log(
       "Leaflet (L):",
-      typeof L !== "undefined" ? "LOADED" : "NOT LOADED",
+      typeof L !== "undefined" ? "LOADED" : "NOT LOADED"
     );
-    console.log(
-      "jQuery:",
-      typeof jQuery !== "undefined" ? jQuery.fn.jquery : "NOT LOADED",
-    );
+    console.log("jQuery:", "NOT REQUIRED (Vanilla JS)");
     console.log("================================");
   }
-})(jQuery);
+})();

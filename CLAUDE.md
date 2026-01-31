@@ -1154,3 +1154,233 @@ $.ajax({
 **Последнее обновление**: 25 января 2025  
 **Версия плагина**: 1.0.0  
 **Статус**: ✅ Работает в продакшене
+---
+
+## 🔄 ТЕКУЩАЯ ЗАДАЧА: Рефакторинг на Vanilla JS
+
+**Статус**: 🟡 В процессе  
+**Дата начала**: [добавь дату]  
+**Ответственный**: Claude Code
+
+### Цель
+Переписать `/assets/js/trip-map.js` с jQuery на чистый JavaScript (Vanilla JS) для улучшения производительности и уменьшения зависимостей.
+
+### Контекст
+Плагин **Kostaryka Trip Map** создан для интерактивной карты локаций в Breakdance popup. Текущая версия использует jQuery, но WordPress загружает jQuery даже там где он не нужен. Переход на Vanilla JS уменьшит зависимости и улучшит производительность.
+
+### Что нужно изменить
+
+#### Файл: `/assets/js/trip-map.js`
+
+**Текущая структура:**
+```javascript
+(function($) {
+    'use strict';
+    
+    let map = null;
+    let markers = [];
+    let markersLayer = null;
+
+    $(document).ready(function() {
+        initTripMapButtons();
+    });
+    
+    // ... остальной код с jQuery
+})(jQuery);
+```
+
+**Целевая структура:**
+```javascript
+(function() {
+    'use strict';
+    
+    let map = null;
+    let markers = [];
+    let markersLayer = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        initTripMapButtons();
+    });
+    
+    // ... весь код на Vanilla JS
+})();
+```
+
+### Таблица замен jQuery → Vanilla JS
+
+| jQuery | Vanilla JS | Комментарий |
+|--------|-----------|-------------|
+| `$(document).ready(fn)` | `document.addEventListener('DOMContentLoaded', fn)` | Ждем загрузки DOM |
+| `$(selector)` | `document.querySelector(selector)` | Один элемент |
+| `$(selector)` | `document.querySelectorAll(selector)` | Несколько элементов |
+| `$(this)` | `this` или `e.currentTarget` | В event handler |
+| `$el.on('click', fn)` | `el.addEventListener('click', fn)` | Event listener |
+| `$(document).on('click', sel, fn)` | Event delegation (см. ниже) | Делегирование |
+| `$el.closest(sel)` | `el.closest(sel)` | Нативный метод |
+| `$el.find(sel)` | `el.querySelector(sel)` | Поиск внутри |
+| `$el.attr('href')` | `el.getAttribute('href')` | Получить атрибут |
+| `$el.data('trip-id')` | `el.dataset.tripId` | Data атрибуты |
+| `$el.html(html)` | `el.innerHTML = html` | Вставка HTML |
+| `$el.addClass('active')` | `el.classList.add('active')` | Добавить класс |
+| `$el.removeClass('active')` | `el.classList.remove('active')` | Убрать класс |
+| `$.ajax({...})` | `fetch(...).then(...)` | AJAX запросы |
+
+### Event Delegation (важно!)
+
+**jQuery способ:**
+```javascript
+$(document).on('click', '.trip-preview-btn', function(e) {
+    e.preventDefault();
+    const tripId = $(this).data('trip-id');
+    // ...
+});
+```
+
+**Vanilla JS способ:**
+```javascript
+document.addEventListener('click', function(e) {
+    // Проверяем что клик по нужному элементу
+    const button = e.target.closest('.trip-preview-btn');
+    if (!button) return;
+    
+    e.preventDefault();
+    const tripId = button.dataset.tripId;
+    // ...
+});
+```
+
+### AJAX: $.ajax() → fetch()
+
+**jQuery способ:**
+```javascript
+$.ajax({
+    url: tripMapData.ajaxUrl,
+    type: 'POST',
+    data: {
+        action: 'get_trip_locations',
+        trip_id: tripId,
+        nonce: tripMapData.nonce
+    },
+    success: function(response) {
+        console.log(response);
+    },
+    error: function(xhr, status, error) {
+        console.error(error);
+    }
+});
+```
+
+**Vanilla JS способ (современный async/await):**
+```javascript
+async function loadTripLocations(tripId) {
+    try {
+        // Создаем FormData для POST запроса
+        const formData = new FormData();
+        formData.append('action', 'get_trip_locations');
+        formData.append('trip_id', tripId);
+        formData.append('nonce', tripMapData.nonce);
+        
+        const response = await fetch(tripMapData.ajaxUrl, {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log(data.data);
+        } else {
+            throw new Error(data.data);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showError(error.message);
+    }
+}
+```
+
+### Важные функции для переписывания
+
+#### 1. `initTripMapButtons()`
+- Заменить event delegation с jQuery на Vanilla
+
+#### 2. `handleButtonClick(e)`
+- Заменить `$(this)` на `e.currentTarget` или `e.target.closest()`
+- Заменить `.closest()`, `.find()` на нативные методы
+- Заменить `.attr()` на `.getAttribute()`
+
+#### 3. `loadTripLocations(tripId)`
+- ПОЛНОСТЬЮ переписать с `$.ajax()` на `fetch()` + async/await
+- Обработка ошибок через try/catch
+
+#### 4. `renderLocationsList(locations)`
+- Заменить `$('#locations-list').html(html)` на `document.getElementById('locations-list').innerHTML = html`
+- Заменить `$('.location-item').on('click', ...)` на event delegation
+
+#### 5. `showLoader()` и `showError()`
+- Заменить jQuery селекторы на нативные
+
+#### 6. `escapeHtml(text)`
+- Оставить как есть (не использует jQuery)
+
+### Критически важно
+
+1. **Event delegation** - клики должны работать на динамически добавленных элементах
+2. **Async/await** - использовать современный синтаксис для AJAX
+3. **Error handling** - обязательно try/catch для всех fetch запросов
+4. **Тестирование** - после изменений протестировать ВСЮ функциональность
+
+### Файлы для изменения
+
+1. **Главный файл**: `/wp-content/plugins/kostaryka-trip-map/assets/js/trip-map.js`
+2. **PHP файл** (минимальные изменения): `/wp-content/plugins/kostaryka-trip-map/kostaryka-trip-map.php`
+
+В PHP изменить только:
+```php
+wp_enqueue_script('kostaryka-trip-map', 
+    KOSTARYKA_TRIP_MAP_PLUGIN_URL . 'assets/js/trip-map.js',
+    array(),  // ← Убрать 'jquery' из зависимостей!
+    KOSTARYKA_TRIP_MAP_VERSION,
+    true
+);
+```
+
+### Чеклист выполнения
+
+- [ ] Заменены все jQuery селекторы на нативные
+- [ ] Event delegation работает корректно
+- [ ] AJAX переписан на fetch() с async/await
+- [ ] Все функции работают без jQuery
+- [ ] Нет ошибок в консоли
+- [ ] Протестирована вся функциональность:
+  - [ ] Клик по кнопке открывает popup
+  - [ ] Загружаются данные локаций
+  - [ ] Отображается список локаций
+  - [ ] Отображается карта с маркерами
+  - [ ] Клик по локации фокусирует карту
+  - [ ] Клик по маркеру открывает popup
+- [ ] Удалена зависимость от jQuery в PHP
+- [ ] Обновлена документация
+
+### Ожидаемый результат
+
+**До:**
+- Размер: ~6KB
+- Зависимости: jQuery (30KB)
+- Итого: 36KB
+
+**После:**
+- Размер: ~4-5KB
+- Зависимости: нет
+- Итого: 4-5KB
+
+**Выигрыш**: ~31KB меньше загрузки
+
+### Следующий этап
+
+После завершения рефакторинга переходим к **Этапу 2: Lazy Loading**.
+```

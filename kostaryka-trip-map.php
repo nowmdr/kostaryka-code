@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: Kostaryka Trip Map
+ * Plugin Name: Kostaryka Code
  * Plugin URI: https://kostaryka.pl
  * Description: Interaktywna mapa lokacji dla Custom Post Type "Wyprawy" z Leaflet.js i OpenStreetMap
  * Version: 1.0.0
@@ -97,7 +97,10 @@ class Kostaryka_Trip_Map
         );
 
         // Custom styles for Leaflet popup
-        wp_add_inline_style("leaflet-css", ".leaflet-popup-content { margin: 8px; }");
+        wp_add_inline_style(
+            "leaflet-css",
+            ".leaflet-popup-content { margin: 8px; }",
+        );
 
         // Leaflet JS
         wp_enqueue_script(
@@ -108,11 +111,11 @@ class Kostaryka_Trip_Map
             true,
         );
 
-        // Nasz główny skrypt
+        // Nasz główny skrypt (Vanilla JS - bez jQuery)
         wp_enqueue_script(
             "kostaryka-trip-map",
             KOSTARYKA_TRIP_MAP_PLUGIN_URL . "assets/js/trip-map.js",
-            ["jquery", "leaflet-js"],
+            ["leaflet-js"],
             KOSTARYKA_TRIP_MAP_VERSION,
             true,
         );
