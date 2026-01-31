@@ -3,7 +3,7 @@
  * Plugin Name: Kostaryka Code
  * Plugin URI: https://kostaryka.pl
  * Description: Interaktywna mapa lokacji dla Custom Post Type "Wyprawy" z Leaflet.js i OpenStreetMap
- * Version: 1.0.0
+ * Version: 1.2.0
  * Author: Jauhien
  * Author URI: https://kostaryka.pl
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if (!defined("ABSPATH")) {
 }
 
 // Definicja stałych
-define("KOSTARYKA_TRIP_MAP_VERSION", "1.0.0");
+define("KOSTARYKA_TRIP_MAP_VERSION", "1.2.0");
 define("KOSTARYKA_TRIP_MAP_PLUGIN_DIR", plugin_dir_path(__FILE__));
 define("KOSTARYKA_TRIP_MAP_PLUGIN_URL", plugin_dir_url(__FILE__));
 
@@ -84,48 +84,45 @@ class Kostaryka_Trip_Map
     }
 
     /**
-     * Podłączanie skryptów i stylów
+     * Podłączanie skryptów i stylów (z Lazy Loading)
      */
     public function enqueue_scripts()
     {
-        // Leaflet CSS
+        // Warunkowe ładowanie - tylko na stronach gdzie może być potrzebne
+        // Możesz dodać więcej warunków jeśli potrzeba
+        // if (!is_post_type_archive('oferta') && !is_singular('oferta') && !is_home()) {
+        //     return;
+        // }
+
+        // Loader CSS (mały plik, zawsze ładowany)
         wp_enqueue_style(
-            "leaflet-css",
-            "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+            "kostaryka-trip-map-loader",
+            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "assets/css/loader.css",
             [],
-            "1.9.4",
+            KOSTARYKA_TRIP_MAP_VERSION
         );
 
-        // Custom styles for Leaflet popup
-        wp_add_inline_style(
-            "leaflet-css",
-            ".leaflet-popup-content { margin: 8px; }",
-        );
+        // UWAGA: Leaflet CSS i JS NIE są ładowane tutaj!
+        // Będą załadowane dynamicznie przez JavaScript przy pierwszym użyciu
 
-        // Leaflet JS
-        wp_enqueue_script(
-            "leaflet-js",
-            "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
-            [],
-            "1.9.4",
-            true,
-        );
-
-        // Nasz główny skrypt (Vanilla JS - bez jQuery)
+        // Nasz główny skrypt (Vanilla JS + Lazy Loading)
         wp_enqueue_script(
             "kostaryka-trip-map",
             KOSTARYKA_TRIP_MAP_PLUGIN_URL . "assets/js/trip-map.js",
-            ["leaflet-js"],
+            [], // Brak zależności - Leaflet będzie lazy loaded
             KOSTARYKA_TRIP_MAP_VERSION,
-            true,
+            true
         );
 
-        // Przekazanie danych do JavaScript
+        // Przekazanie danych do JavaScript (włącznie z URL-ami dla Leaflet)
         wp_localize_script("kostaryka-trip-map", "tripMapData", [
             "ajaxUrl" => admin_url("admin-ajax.php"),
             "nonce" => wp_create_nonce("trip_map_nonce"),
             "pluginUrl" => KOSTARYKA_TRIP_MAP_PLUGIN_URL,
             "version" => KOSTARYKA_TRIP_MAP_VERSION,
+            // URLs dla lazy loading Leaflet
+            "leafletCssUrl" => "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
+            "leafletJsUrl" => "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
         ]);
     }
 

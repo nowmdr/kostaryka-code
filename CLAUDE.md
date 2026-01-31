@@ -1384,3 +1384,401 @@ wp_enqueue_script('kostaryka-trip-map',
 
 После завершения рефакторинга переходим к **Этапу 2: Lazy Loading**.
 ```
+---
+
+## 🔄 ТЕКУЩАЯ ЗАДАЧА: Lazy Loading + Единый Loader
+
+**Статус**: 🟡 В процессе  
+**Дата начала**: [добавь дату]  
+**Зависит от**: ✅ Этап 1 - Рефакторинг на Vanilla JS (завершен)
+
+### Цель
+Реализовать отложенную загрузку Leaflet.js и CSS только при открытии popup, с красивым единым loader'ом на весь popup.
+
+### Проблема сейчас
+- Leaflet.js (~40KB) и Leaflet.css (~12KB) загружаются при загрузке страницы
+- Это ~52KB которые не нужны пока пользователь не откроет popup
+- Нет визуальной обратной связи во время загрузки
+
+### Решение
+1. **НЕ загружать** Leaflet при загрузке страницы
+2. При клике на кнопку:
+   - Показать единый loader на весь popup
+   - Параллельно загрузить: Leaflet CSS, Leaflet JS, данные через AJAX
+   - Когда все готово - скрыть loader и показать контент
+3. При повторном открытии - использовать кэш (Leaflet уже загружен)
+
+### Архитектура
+
+#### Последовательность действий:
+```
+1. User клик на кнопку "Podgląd"
+   ↓
+2. Открывается Breakdance popup (пустой)
+   ↓
+3. showGlobalLoader() → показываем loader на весь popup
+   ↓
+4. Promise.all([
+     ensureLeafletLoaded(),  ← загружает CSS+JS если еще не загружен
+     fetchTripData(tripId)   ← AJAX запрос данных
+   ])
+   ↓
+5. hideGlobalLoader() → убираем loader
+   ↓
+6. renderLocationsList() → список слева
+   ↓
+7. initMap() → карта справа
+```
+
+#### Кэширование:
+```javascript
+let leafletLoaded = false;  // Флаг: загружен ли Leaflet
+
+async function ensureLeafletLoaded() {
+    if (leafletLoaded) {
+        console.log('Leaflet already loaded');
+        return Promise.resolve();
+    }
+    
+    console.log('Loading Leaflet for the first time...');
+    
+    // Загружаем CSS и JS параллельно
+    await Promise.all([
+        loadLeafletCSS(),
+        loadLeafletJS()
+    ]);
+    
+    leafletLoaded = true;
+    console.log('Leaflet loaded successfully');
+}
+```
+
+### Компоненты для создания
+
+#### 1. Global Loader (HTML структура)
+```html
+<div id="trip-map-global-loader" class="trip-map-loader">
+    <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <p class="loader-message">Ładowanie mapy...</p>
+    </div>
+</div>
+```
+
+#### 2. CSS для Loader
+Создать файл: `/assets/css/loader.css`
+```css
+.trip-map-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2271b1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-message {
+    color: #333;
+    font-size: 16px;
+    margin: 0;
+}
+```
+
+#### 3. JavaScript функции
+
+##### showGlobalLoader(message)
+```javascript
+function showGlobalLoader(message = 'Ładowanie...') {
+    // Проверяем существует ли уже loader
+    let loader = document.getElementById('trip-map-global-loader');
+    
+    if (!loader) {
+        // Создаем loader
+        loader = document.createElement('div');
+        loader.id = 'trip-map-global-loader';
+        loader.className = 'trip-map-loader';
+        loader.innerHTML = `
+            <div class="loader-content">
+                <div class="loader-spinner"></div>
+                <p class="loader-message">${message}</p>
+            </div>
+        `;
+        
+        // Добавляем в popup
+        const popup = document.querySelector('.bde-popup-content');
+        if (popup) {
+            popup.appendChild(loader);
+        }
+    } else {
+        // Обновляем сообщение
+        const messageEl = loader.querySelector('.loader-message');
+        if (messageEl) {
+            messageEl.textContent = message;
+        }
+        loader.style.display = 'flex';
+    }
+}
+```
+
+##### hideGlobalLoader()
+```javascript
+function hideGlobalLoader() {
+    const loader = document.getElementById('trip-map-global-loader');
+    if (loader) {
+        loader.style.display = 'none';
+    }
+}
+```
+
+##### loadLeafletCSS()
+```javascript
+function loadLeafletCSS() {
+    return new Promise((resolve, reject) => {
+        // Проверяем не загружен ли уже
+        if (document.querySelector('link[href*="leaflet.css"]')) {
+            resolve();
+            return;
+        }
+        
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = tripMapData.leafletCssUrl;
+        link.onload = () => resolve();
+        link.onerror = () => reject(new Error('Failed to load Leaflet CSS'));
+        document.head.appendChild(link);
+    });
+}
+```
+
+##### loadLeafletJS()
+```javascript
+function loadLeafletJS() {
+    return new Promise((resolve, reject) => {
+        // Проверяем не загружен ли уже
+        if (typeof L !== 'undefined') {
+            resolve();
+            return;
+        }
+        
+        const script = document.createElement('script');
+        script.src = tripMapData.leafletJsUrl;
+        script.onload = () => {
+            if (typeof L !== 'undefined') {
+                resolve();
+            } else {
+                reject(new Error('Leaflet loaded but L is undefined'));
+            }
+        };
+        script.onerror = () => reject(new Error('Failed to load Leaflet JS'));
+        document.head.appendChild(script);
+    });
+}
+```
+
+##### ensureLeafletLoaded()
+```javascript
+let leafletLoaded = false;
+
+async function ensureLeafletLoaded() {
+    if (leafletLoaded) {
+        return;
+    }
+    
+    try {
+        await Promise.all([
+            loadLeafletCSS(),
+            loadLeafletJS()
+        ]);
+        leafletLoaded = true;
+        console.log('Leaflet loaded successfully');
+    } catch (error) {
+        console.error('Error loading Leaflet:', error);
+        throw error;
+    }
+}
+```
+
+##### Обновленный handleButtonClick()
+```javascript
+async function handleButtonClick(e) {
+    e.preventDefault();
+    
+    const button = e.target.closest('.trip-preview-btn');
+    if (!button) return;
+    
+    // Показываем loader
+    showGlobalLoader('Ładowanie mapy...');
+    
+    try {
+        // Получаем ID поста
+        const tripId = await getPostIdFromButton(button);
+        
+        // Параллельно загружаем Leaflet и данные
+        const [_, tripData] = await Promise.all([
+            ensureLeafletLoaded(),
+            fetchTripData(tripId)
+        ]);
+        
+        // Скрываем loader
+        hideGlobalLoader();
+        
+        // Рендерим контент
+        renderLocationsList(tripData);
+        initMap(tripData);
+        
+    } catch (error) {
+        hideGlobalLoader();
+        showError(error.message);
+        console.error('Error:', error);
+    }
+}
+```
+
+### Изменения в PHP
+
+Файл: `/wp-content/plugins/kostaryka-trip-map/kostaryka-trip-map.php`
+
+#### 1. Убрать загрузку Leaflet из enqueue_scripts()
+```php
+public function enqueue_scripts() {
+    // Условная загрузка
+    if (!is_post_type_archive('oferta') && 
+        !is_singular('oferta') && 
+        !is_home()) {
+        return;
+    }
+    
+    // НЕ загружаем Leaflet здесь!
+    // Только наш CSS
+    wp_enqueue_style(
+        'kostaryka-trip-map-loader',
+        KOSTARYKA_TRIP_MAP_PLUGIN_URL . 'assets/css/loader.css',
+        array(),
+        KOSTARYKA_TRIP_MAP_VERSION
+    );
+    
+    // Только наш JS
+    wp_enqueue_script(
+        'kostaryka-trip-map',
+        KOSTARYKA_TRIP_MAP_PLUGIN_URL . 'assets/js/trip-map.js',
+        array(),
+        KOSTARYKA_TRIP_MAP_VERSION,
+        true
+    );
+    
+    // Передаем URLs для Leaflet (будет загружен динамически)
+    wp_localize_script('kostaryka-trip-map', 'tripMapData', array(
+        'ajaxUrl' => admin_url('admin-ajax.php'),
+        'nonce' => wp_create_nonce('trip_map_nonce'),
+        'pluginUrl' => KOSTARYKA_TRIP_MAP_PLUGIN_URL,
+        'leafletCssUrl' => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
+        'leafletJsUrl' => 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'
+    ));
+}
+```
+
+### Структура файлов после изменений
+```
+kostaryka-trip-map/
+├── kostaryka-trip-map.php
+├── assets/
+│   ├── js/
+│   │   └── trip-map.js          ← обновлен с lazy loading
+│   └── css/
+│       └── loader.css           ← НОВЫЙ файл
+└── README.md
+```
+
+### Тестирование
+
+#### 1. Первое открытие popup
+- [ ] Клик по кнопке
+- [ ] Появляется loader на весь popup
+- [ ] Loader показывает "Ładowanie mapy..."
+- [ ] Через ~1-2 секунды loader исчезает
+- [ ] Появляется список локаций и карта
+- [ ] В Network tab видно загрузку leaflet.css и leaflet.js
+
+#### 2. Повторное открытие popup (тот же пост)
+- [ ] Клик по кнопке
+- [ ] Loader появляется на короткое время
+- [ ] Контент загружается мгновенно (из кэша)
+- [ ] В Network tab НЕТ новых запросов на leaflet.css/js
+
+#### 3. Открытие другого поста
+- [ ] Клик по кнопке другого поста
+- [ ] Loader появляется
+- [ ] Leaflet НЕ загружается повторно (уже в памяти)
+- [ ] Загружаются только новые данные AJAX
+
+#### 4. Медленное соединение
+- [ ] Chrome DevTools → Network → Throttling → Slow 3G
+- [ ] Клик по кнопке
+- [ ] Loader показывается все время загрузки
+- [ ] Нет "моргания" или "прыжков" контента
+- [ ] Все загружается корректно
+
+#### 5. Ошибки
+- [ ] Отключить интернет
+- [ ] Клик по кнопке
+- [ ] Loader исчезает
+- [ ] Показывается понятная ошибка
+- [ ] Консоль показывает детали ошибки
+
+### Чеклист выполнения
+
+- [ ] Создан файл `/assets/css/loader.css`
+- [ ] Добавлены функции: showGlobalLoader, hideGlobalLoader
+- [ ] Добавлены функции: loadLeafletCSS, loadLeafletJS
+- [ ] Добавлена функция: ensureLeafletLoaded с кэшированием
+- [ ] Обновлен handleButtonClick с Promise.all
+- [ ] Обновлен PHP файл (убрана загрузка Leaflet)
+- [ ] Добавлены URLs Leaflet в wp_localize_script
+- [ ] Протестировано первое открытие popup
+- [ ] Протестировано повторное открытие
+- [ ] Протестировано на медленном соединении
+- [ ] Протестирована обработка ошибок
+- [ ] Обновлена документация
+
+### Ожидаемый результат
+
+**Загрузка страницы:**
+- Раньше: 5KB (наш JS) + 12KB (Leaflet CSS) + 40KB (Leaflet JS) = 57KB
+- Теперь: 5KB (наш JS) + 2KB (loader CSS) = 7KB
+- **Выигрыш: 50KB меньше при загрузке страницы**
+
+**Первое открытие popup:**
+- Загружается: 52KB (Leaflet) + 2KB (данные AJAX) = 54KB
+- Время: ~1-2 секунды с красивым loader'ом
+
+**Повторное открытие:**
+- Загружается: 2KB (только данные AJAX)
+- Время: <100ms (мгновенно)
+
+### Следующий этап
+
+После завершения переходим к **Этапу 3: Условная загрузка скриптов** (финальная оптимизация).
+```
