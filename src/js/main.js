@@ -17,6 +17,7 @@ import {
 import { initMap } from './map.js';
 import { renderLocationsList } from './locations-list.js';
 import { debugLog } from './utils.js';
+import { initGallery } from './gallery.js';
 
 /**
  * Инициализация кнопок карты
@@ -87,4 +88,5 @@ if (window.location.search.indexOf('debug_trip_map=1') !== -1) {
  */
 document.addEventListener('DOMContentLoaded', () => {
   initTripMapButtons();
+  initGallery(); // Инициализация модуля галереи
 });
