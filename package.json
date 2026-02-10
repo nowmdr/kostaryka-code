@@ -1,0 +1,19 @@
+{
+  "name": "kostaryka-trip-map",
+  "version": "1.2.0",
+  "type": "module",
+  "description": "WordPress plugin with interactive trip map using Leaflet",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && npm run copy-leaflet-icons",
+    "copy-leaflet-icons": "cp node_modules/leaflet/dist/images/marker-*.png dist/assets/ && cp node_modules/leaflet/dist/images/marker-shadow.png dist/assets/",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "terser": "^5.46.0",
+    "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "leaflet": "^1.9.4"
+  }
+}

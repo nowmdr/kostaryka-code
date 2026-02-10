@@ -1,0 +1,50 @@
+/**
+ * Kostaryka Trip Map - Loader Styles
+ * Version: 1.1.0
+ */
+
+/* Глобальный loader на весь popup */
+.trip-map-loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999999;
+    backdrop-filter: blur(2px);
+}
+
+.loader-content {
+    text-align: center;
+}
+
+.loader-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #2271b1;
+    border-radius: 50%;
+    animation: trip-map-spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes trip-map-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader-message {
+    color: #333;
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+}
+
+/* Скрытый loader */
+.trip-map-loader[style*="display: none"] {
+    display: none !important;
+}

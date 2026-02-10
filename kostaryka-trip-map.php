@@ -3,7 +3,7 @@
  * Plugin Name: Kostaryka Code
  * Plugin URI: https://kostaryka.pl
  * Description: Interaktywna mapa lokacji dla Custom Post Type "Wyprawy" z Leaflet.js i OpenStreetMap
- * Version: 1.2.0
+ * Version: 2.0.0
  * Author: Jauhien
  * Author URI: https://kostaryka.pl
  * License: GPL v2 or later
@@ -19,7 +19,7 @@ if (!defined("ABSPATH")) {
 }
 
 // Definicja stałych
-define("KOSTARYKA_TRIP_MAP_VERSION", "1.2.0");
+define("KOSTARYKA_TRIP_MAP_VERSION", "2.0.0");
 define("KOSTARYKA_TRIP_MAP_PLUGIN_DIR", plugin_dir_path(__FILE__));
 define("KOSTARYKA_TRIP_MAP_PLUGIN_URL", plugin_dir_url(__FILE__));
 
@@ -120,30 +120,28 @@ class Kostaryka_Trip_Map
      */
     private function do_enqueue_scripts()
     {
-        // Loader CSS
+        // CSS z Vite bundle (zawiera loader.css + leaflet.css)
         wp_enqueue_style(
-            "kostaryka-trip-map-loader",
-            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "assets/css/loader.css",
+            "kostaryka-trip-map",
+            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "dist/main.css",
             [],
             KOSTARYKA_TRIP_MAP_VERSION
         );
 
-        // Nasz JS (Vanilla JS + Lazy Loading)
+        // JS z Vite bundle (wszystkie moduły + Leaflet)
         wp_enqueue_script(
             "kostaryka-trip-map",
-            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "assets/js/trip-map.js",
+            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "dist/main.js",
             [],
             KOSTARYKA_TRIP_MAP_VERSION,
             true
         );
 
-        // Lokalizacja danych dla JS
+        // Lokalizacja danych dla JS (leafletCssUrl i leafletJsUrl już не нужны)
         wp_localize_script("kostaryka-trip-map", "tripMapData", [
             "ajaxUrl" => admin_url("admin-ajax.php"),
             "nonce" => wp_create_nonce("trip_map_nonce"),
             "pluginUrl" => KOSTARYKA_TRIP_MAP_PLUGIN_URL,
-            "leafletCssUrl" => "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css",
-            "leafletJsUrl" => "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js",
         ]);
     }
 
