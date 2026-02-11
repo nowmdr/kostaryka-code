@@ -96,3 +96,22 @@ export function extractPostSlugFromButton(button) {
 
   return postSlug;
 }
+
+/**
+ * Извлечь ID поста из body class (для single страниц)
+ * WordPress добавляет класс вида "postid-389" к body
+ * @returns {number|null} - ID поста или null если не найден
+ */
+export function extractPostIdFromBody() {
+  const bodyClasses = document.body.className;
+  const match = bodyClasses.match(/postid-(\d+)/);
+
+  if (match && match[1]) {
+    const postId = parseInt(match[1], 10);
+    debugLog('Znaleziono ID postu z body class:', postId);
+    return postId;
+  }
+
+  debugLog('Nie znaleziono ID postu w body class');
+  return null;
+}
