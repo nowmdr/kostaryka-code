@@ -5,6 +5,7 @@
 
 // Импорт стилей
 import '../css/loader.css';
+import '../css/contact-form.css';
 
 // Импорт модулей
 import { showGlobalLoader, hideGlobalLoader, showError } from './loader.js';
@@ -19,6 +20,7 @@ import { initMap } from './map.js';
 import { renderLocationsList } from './locations-list.js';
 import { debugLog } from './utils.js';
 import { initGallery } from './gallery.js';
+import { initContactForm } from './contactForm.js';
 
 /**
  * Инициализация кнопок карты на homepage
@@ -157,4 +159,5 @@ document.addEventListener('DOMContentLoaded', () => {
   initTripMapButtons();      // Кнопки на homepage
   initSinglePageButton();    // Кнопка на single странице
   initGallery();             // Модуль галереи
+  initContactForm();         // Formularz kontaktowy
 });

@@ -1,0 +1,181 @@
+/**
+ * Trip Contact Form - BEM Skeleton
+ * All selectors are prepared for styling. No rules applied.
+ * Add styles directly to each selector.
+ */
+
+/* ----------------------------------------
+   SECTION WRAPPER
+   ---------------------------------------- */
+.trip-contact-form {
+    padding: 2rem;
+    border-radius: 1.5rem;
+    background-color: #ffe780;
+}
+
+/* ----------------------------------------
+   HEADER
+   ---------------------------------------- */
+.trip-contact-form__header {
+    border-bottom: 1px solid #ecc000;
+    padding-bottom: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.trip-contact-form__price-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.trip-contact-form__price {
+    color: #020202;
+    font-size: clamp(1.5rem, 1.2592rem + 1.1009vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2em;
+}
+
+.trip-contact-form__duration {
+    color: #020202;
+    font-size: clamp(1.5rem, 1.2592rem + 1.1009vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2em;
+}
+
+.trip-contact-form__info {
+    display: flex;
+    gap: 8px;
+}
+
+.trip-contact-form__info-icon {
+    flex-shrink: 0;
+}
+
+.trip-contact-form__info-text {
+    font-size: 1rem;
+    line-height: 1em;
+    font-weight: 500;
+    color: #000000;
+}
+
+/* ----------------------------------------
+   FORM
+   ---------------------------------------- */
+.trip-contact-form__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.trip-contact-form__fields-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* ----------------------------------------
+   FIELDS
+   ---------------------------------------- */
+.trip-contact-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.trip-contact-form__label {
+    color: #020202;
+    font-size: clamp(1rem, 0.961rem + 0.177vw, 1.125rem);
+    font-weight: 500;
+    line-height: 1.4em;
+    display: flex;
+    gap: 2px;
+}
+.trip-contact-form__label span {
+    color: #f00000;
+    font-size: 1rem;
+    font-weight: 500;
+}
+.trip-contact-form__field--select {
+    border-bottom: 1px solid #ecc000;
+    padding-bottom: 1.25rem;
+    padding-top: 1.25rem;
+}
+.trip-contact-form__input,
+.trip-contact-form__select,
+.trip-contact-form__textarea {
+    background: #ffffff;
+    border: 1px solid #e8e8e8;
+    padding: 0.8rem;
+    border-radius: 0.625rem;
+    color: #020202;
+    font-size: clamp(1rem, 0.961rem + 0.177vw, 1.125rem);
+    font-weight: 500;
+    line-height: 1.4em;
+}
+.trip-contact-form__input::placeholder,
+.trip-contact-form__textarea::placeholder {
+    opacity: 1;
+    color: #727272;
+}
+
+.trip-contact-form__input {
+}
+.trip-contact-form__select {
+}
+
+.trip-contact-form__textarea {
+}
+.trip-contact-form__field--checkbox {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.trip-contact-form__checkbox-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+.trip-contact-form__checkbox {
+}
+
+.trip-contact-form__checkbox-label {
+    font-size: 0.875rem;
+    line-height: 1.2em;
+    color: #727272;
+}
+
+.trip-contact-form__no-dates {
+}
+
+.trip-contact-form__field-error {
+    margin-top: 2px;
+    color: #f00000;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+/* ----------------------------------------
+   SUBMIT BUTTON
+   ---------------------------------------- */
+.trip-contact-form__submit {
+}
+
+.trip-contact-form__submit--disabled {
+}
+
+/* ----------------------------------------
+   MESSAGES
+   ---------------------------------------- */
+.trip-contact-form__messages {
+}
+
+.trip-contact-form__message {
+}
+
+.trip-contact-form__message--success {
+}
+
+.trip-contact-form__message--error {
+}
