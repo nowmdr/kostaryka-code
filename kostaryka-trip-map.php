@@ -463,7 +463,12 @@ class Kostaryka_Trip_Map
                     : ""; ?>"
                         type="submit"
                         <?php echo !$has_dates ? "disabled" : ""; ?>>
-                    Wyślij wiadomość
+                    <span class="trip-contact-form__submit-text">Wyślij wiadomość</span>
+                    <span class="trip-contact-form__submit-icon" aria-hidden="true">
+                        <svg width="13" height="8" viewBox="0 0 13 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11.2928 0.292969C11.6834 -0.0975556 12.3164 -0.0975556 12.7069 0.292969C13.0973 0.683501 13.0974 1.31654 12.7069 1.70703L7.20691 7.20703C6.81642 7.59747 6.18336 7.59744 5.79285 7.20703L0.292847 1.70703C-0.0976624 1.31652 -0.0976319 0.683497 0.292847 0.292969C0.683371 -0.0975556 1.31638 -0.0975556 1.70691 0.292969L6.49988 5.08594L11.2928 0.292969Z" fill="#020202"/>
+                        </svg>
+                    </span>
                 </button>
 
             </form>
