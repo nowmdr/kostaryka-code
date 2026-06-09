@@ -70,6 +70,9 @@ class Kostaryka_Trip_Map
         // Shortcode formularza kontaktowego
         add_shortcode("trip_contact_form", [$this, "render_contact_form"]);
 
+        // Shortcode formularza na stronie /kontakt/
+        add_shortcode("contact_form", [$this, "render_kontakt_form"]);
+
         // Admin notices (opcjonalne)
         add_action("admin_notices", [$this, "check_dependencies"]);
     }
@@ -106,6 +109,11 @@ class Kostaryka_Trip_Map
 
         // 3. Strona ze slug "oferta"
         if (is_page("oferta")) {
+            $should_load = true;
+        }
+
+        // 4. Strona ze slug "kontakt"
+        if (is_page("kontakt")) {
             $should_load = true;
         }
 
@@ -474,6 +482,108 @@ class Kostaryka_Trip_Map
             </form>
 
             <div class="trip-contact-form__messages" aria-live="polite"></div>
+
+        </div>
+        <?php return ob_get_clean();
+    }
+
+    /**
+     * Shortcode [contact_form] - renderowanie formularza na stronie /kontakt/
+     *
+     * @return string HTML formularza
+     */
+    public function render_kontakt_form()
+    {
+        static $instance = 0;
+        $instance++;
+
+        $nonce = wp_create_nonce("contact_form_nonce");
+        $form_id = "kontakt-form-" . $instance;
+
+        ob_start();
+        ?>
+        <div class="kontakt-form"
+             data-nonce="<?php echo esc_attr($nonce); ?>">
+
+            <form class="kontakt-form__form" id="<?php echo esc_attr(
+                $form_id,
+            ); ?>" novalidate>
+
+                <div class="kontakt-form__fields-wrapper">
+                    <div class="kontakt-form__field">
+                        <label class="kontakt-form__label" for="<?php echo esc_attr(
+                            $form_id,
+                        ); ?>-name">
+                            Imię i nazwisko <span aria-hidden="true">*</span>
+                        </label>
+                        <input class="kontakt-form__input"
+                            type="text"
+                            id="<?php echo esc_attr($form_id); ?>-name"
+                            name="name"
+                            placeholder="Podaj imię i nazwisko"
+                            required
+                            aria-required="true">
+                    </div>
+
+                    <div class="kontakt-form__field">
+                        <label class="kontakt-form__label" for="<?php echo esc_attr(
+                            $form_id,
+                        ); ?>-email">
+                            E-mail <span aria-hidden="true">*</span>
+                        </label>
+                        <input class="kontakt-form__input"
+                            type="email"
+                            id="<?php echo esc_attr($form_id); ?>-email"
+                            name="email"
+                            placeholder="Podaj adres e-mail"
+                            required
+                            aria-required="true">
+                    </div>
+
+                    <div class="kontakt-form__field">
+                        <label class="kontakt-form__label" for="<?php echo esc_attr(
+                            $form_id,
+                        ); ?>-message">
+                            Wiadomość <span aria-hidden="true">*</span>
+                        </label>
+                        <textarea class="kontakt-form__textarea"
+                                id="<?php echo esc_attr($form_id); ?>-message"
+                                name="message"
+                                placeholder="Wpisz treść wiadomości"
+                                rows="4"
+                                required
+                                aria-required="true"></textarea>
+                    </div>
+                </div>
+
+                <div class="kontakt-form__field kontakt-form__field--checkbox">
+                    <div class="kontakt-form__checkbox-wrapper">
+                        <input class="kontakt-form__checkbox"
+                            type="checkbox"
+                            id="<?php echo esc_attr($form_id); ?>-consent"
+                            name="consent"
+                            required
+                            aria-required="true">
+                        <label class="kontakt-form__checkbox-label" for="<?php echo esc_attr(
+                            $form_id,
+                        ); ?>-consent">
+                            Wyrażam zgodę na przetwarzanie moich danych osobowych przez KDC Tour sp.&nbsp;z&nbsp;o.o. w celu udzielenia odpowiedzi na przesłane zapytanie. Szczegółowe informacje na temat przetwarzania Państwa danych osobowych znajdują się w Polityce Prywatności.
+                        </label>
+                    </div>
+                </div>
+
+                <button class="kontakt-form__submit" type="submit">
+                    <span class="kontakt-form__submit-text">Wyślij wiadomość</span>
+                    <span class="kontakt-form__submit-icon" aria-hidden="true">
+                        <svg width="13" height="8" viewBox="0 0 13 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11.2928 0.292969C11.6834 -0.0975556 12.3164 -0.0975556 12.7069 0.292969C13.0973 0.683501 13.0974 1.31654 12.7069 1.70703L7.20691 7.20703C6.81642 7.59747 6.18336 7.59744 5.79285 7.20703L0.292847 1.70703C-0.0976624 1.31652 -0.0976319 0.683497 0.292847 0.292969C0.683371 -0.0975556 1.31638 -0.0975556 1.70691 0.292969L6.49988 5.08594L11.2928 0.292969Z" fill="#020202"/>
+                        </svg>
+                    </span>
+                </button>
+
+            </form>
+
+            <div class="kontakt-form__messages" aria-live="polite"></div>
 
         </div>
         <?php return ob_get_clean();

@@ -1,0 +1,549 @@
+[
+      {
+            "key": "group_about_us_updated",
+            "title": "O nas",
+            "fields": [
+                  {
+                        "key": "field_about_hero_accordion",
+                        "label": "Sekcja Hero",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_hero_image",
+                        "label": "Hero Obrazek",
+                        "name": "about_hero_image",
+                        "type": "image",
+                        "return_format": "array",
+                        "preview_size": "medium",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_features_accordion",
+                        "label": "Sekcja 2 - Kim jesteśmy",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_features_title",
+                        "label": "Tytuł sekcji",
+                        "name": "about_features_title",
+                        "type": "text",
+                        "default_value": "Kim jesteśmy",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_features_text",
+                        "label": "Tekst główny",
+                        "name": "about_features_text",
+                        "type": "wysiwyg",
+                        "default_value": "Jesteśmy butikowym biurem podróży. Nasz zespół to ludzie zafascynowani Kostaryką (a może nawet w niej zakochani?). Jedni z nas mieszkają tam na stałe, inni starają się spędzać jak najwięcej czasu w tropikach. Łączy nas jedno – w Kostaryce wszyscy czujemy się jak w raju (prawie).\n\nOd kilku lat staramy się „zarażać” wszystkich naszą fascynacją. A fascynuje nas niesamowita bioróżnorodność Kostaryki, zwyczaje jej mieszkańców, kultura rdzennej ludności – Indian, jak i fakt, że przyroda kostarykańska potrafi zwalić z nóg.",
+                        "tabs": "all",
+                        "toolbar": "full",
+                        "media_upload": 1,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_card_1_title",
+                        "label": "Karta 1 - Tytuł",
+                        "name": "about_card_1_title",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Znamy Kostarykę od podszewki",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_1_text",
+                        "label": "Karta 1 - Podtytuł/Opis",
+                        "name": "about_card_1_text",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Mieszkamy tam lub regularnie wracamy. Znamy najlepsze miejsca, lokalne smaki i historie, których nie ma w przewodnikach.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_2_title",
+                        "label": "Karta 2 - Tytuł",
+                        "name": "about_card_2_title",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Małe grupy, wielkie przygody",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_2_text",
+                        "label": "Karta 2 - Podtytuł/Opis",
+                        "name": "about_card_2_text",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Maksymalnie 10 osób to gwarancja elastyczności, lepszego kontaktu i dostępu do ukrytych zakątków niedostępnych dla dużych grup.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_3_title",
+                        "label": "Karta 3 - Tytuł",
+                        "name": "about_card_3_title",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Autentyczne doświadczenia",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_3_text",
+                        "label": "Karta 3 - Podtytuł/Opis",
+                        "name": "about_card_3_text",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Nie wozimy po turystycznych szlakach. Pokazujemy prawdziwą Kostarykę – dziką przyrodę, lokalne zwyczaje i miejsca z dala od tłumów.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_4_title",
+                        "label": "Karta 4 - Tytuł",
+                        "name": "about_card_4_title",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Pasja, która zaraża",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_card_4_text",
+                        "label": "Karta 4 - Podtytuł/Opis",
+                        "name": "about_card_4_text",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Kochamy to, co robimy. Naszym celem jest „zarażenie” Was fascynacją Kostaryką – jej bioróżnorodnością, kulturą i magią codzienności.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_gallery_accordion",
+                        "label": "Sekcja - Galeria (Nasz zespół)",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_gallery_title",
+                        "label": "Tytuł",
+                        "name": "about_gallery_title",
+                        "type": "text",
+                        "default_value": "Nasz zespół",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_gallery_subtitle",
+                        "label": "Podtytuł / Tekst",
+                        "name": "about_gallery_subtitle",
+                        "type": "text",
+                        "default_value": "Dzięki naszym polskim przewodnikom, mieszkającym na stałe w Kostaryce, możemy Państwu zaproponować niestandardowe miejsca, unikatowe trasy i niezapomniane doświadczenia. Nasz zespół dba o to, abyście wrócili z Kostaryki nie tylko z pięknymi zdjęciami, ale i z dużą wiedzą o tym wspaniałym kraju.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_gallery",
+                        "label": "Galeria",
+                        "name": "gallery-about0us",
+                        "type": "gallery",
+                        "return_format": "array",
+                        "insert": "append",
+                        "preview_size": "medium",
+                        "library": "all",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_blocks_accordion",
+                        "label": "Sekcja - Bloki informacyjne (Jesteśmy / Dlaczego)",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_1_title",
+                        "label": "Blok 1 - Tytuł",
+                        "name": "about_info_block_1_title",
+                        "type": "text",
+                        "default_value": "Jesteśmy w Kostaryce",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_1_image",
+                        "label": "Blok 1 - Obrazek",
+                        "name": "about_info_block_1_image",
+                        "type": "image",
+                        "return_format": "array",
+                        "preview_size": "medium",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_1_text",
+                        "label": "Blok 1 - Tekst",
+                        "name": "about_info_block_1_text",
+                        "type": "wysiwyg",
+                        "tabs": "all",
+                        "toolbar": "full",
+                        "media_upload": 0,
+                        "default_value": "Borem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.\n\nBorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_2_title",
+                        "label": "Blok 2 - Tytuł",
+                        "name": "about_info_block_2_title",
+                        "type": "text",
+                        "default_value": "Dlaczego w Kostaryce",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_2_image",
+                        "label": "Blok 2 - Obrazek",
+                        "name": "about_info_block_2_image",
+                        "type": "image",
+                        "return_format": "array",
+                        "preview_size": "medium",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_info_block_2_text",
+                        "label": "Blok 2 - Tekst",
+                        "name": "about_info_block_2_text",
+                        "type": "wysiwyg",
+                        "tabs": "all",
+                        "toolbar": "full",
+                        "media_upload": 0,
+                        "default_value": "Borem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.\n\nBorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc vulputate libero et velit interdum, ac aliquet odio mattis. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_trips_accordion",
+                        "label": "Sekcja - Popularne wycieczki",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_trips_title",
+                        "label": "Tytuł",
+                        "name": "about_trips_title",
+                        "type": "text",
+                        "default_value": "Popularne wycieczki",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_trips_subtitle",
+                        "label": "Podtytuł",
+                        "name": "about_trips_subtitle",
+                        "type": "text",
+                        "default_value": "Planujesz egzotyczną podróż? Zobacz najpopularniejsze wycieczki do Kostaryki, Panamy czy Nikaragui! Sprawdź programy, terminy oraz oferty.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_cta_accordion",
+                        "label": "Sekcja - CTA (Kontakt)",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_cta_title",
+                        "label": "Tytuł",
+                        "name": "about_cta_title",
+                        "type": "text",
+                        "default_value": "Porozmawiajmy o Twojej przygodzie",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_cta_subtitle",
+                        "label": "Podtytuł / Tekst",
+                        "name": "about_cta_subtitle",
+                        "type": "text",
+                        "default_value": "Chcesz dowiedzieć się, jak wygląda prawdziwa Kostaryka? Jesteśmy gotowi odpowiedzieć na każde pytanie i pomóc Ci zaplanować niezapomniany wyjazd z polskim przewodnikiem. Wypełnij formularz kontaktowy — odpiszemy w 24 godziny.",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  },
+                  {
+                        "key": "field_about_cta_button_text",
+                        "label": "Tekst przycisku",
+                        "name": "about_cta_button_text",
+                        "type": "text",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Skontaktuj się z nami",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_cta_button_link",
+                        "label": "Link przycisku",
+                        "name": "about_cta_button_link",
+                        "type": "url",
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0
+                  },
+                  {
+                        "key": "field_about_accordion_endpoint",
+                        "label": "Endpoint",
+                        "name": "",
+                        "type": "accordion",
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 1,
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        }
+                  }
+            ],
+            "location": [
+                  [
+                        {
+                              "param": "post_type",
+                              "operator": "==",
+                              "value": "page"
+                        }
+                  ]
+            ],
+            "active": true,
+            "menu_order": 0,
+            "position": "normal",
+            "style": "default",
+            "label_placement": "top",
+            "instruction_placement": "label",
+            "hide_on_screen": "",
+            "description": ""
+      }
+]

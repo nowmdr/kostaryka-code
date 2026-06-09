@@ -1,0 +1,269 @@
+[
+      {
+            "key": "group_kontakt_page",
+            "title": "Kontakt",
+            "fields": [
+                  {
+                        "key": "field_kontakt_faq_accordion",
+                        "label": "FAQ",
+                        "name": "",
+                        "type": "accordion",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        },
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0
+                  },
+                  {
+                        "key": "field_kontakt_faq_questions",
+                        "label": "Pytania",
+                        "name": "faq_questions",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        },
+                        "layout": "table",
+                        "pagination": 0,
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Dodaj wiersz",
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                              {
+                                    "key": "field_kontakt_faq_question",
+                                    "label": "Pytanie",
+                                    "name": "faq_question",
+                                    "type": "text",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                          "width": "",
+                                          "class": "",
+                                          "id": ""
+                                    },
+                                    "default_value": "",
+                                    "placeholder": "",
+                                    "prepend": "",
+                                    "append": "",
+                                    "maxlength": "",
+                                    "parent_repeater": "field_kontakt_faq_questions"
+                              },
+                              {
+                                    "key": "field_kontakt_faq_answer",
+                                    "label": "Odpowiedź",
+                                    "name": "faq_answer",
+                                    "type": "wysiwyg",
+                                    "instructions": "",
+                                    "required": 0,
+                                    "conditional_logic": 0,
+                                    "wrapper": {
+                                          "width": "",
+                                          "class": "",
+                                          "id": ""
+                                    },
+                                    "default_value": "",
+                                    "tabs": "all",
+                                    "toolbar": "full",
+                                    "media_upload": 0,
+                                    "delay": 0,
+                                    "parent_repeater": "field_kontakt_faq_questions"
+                              }
+                        ]
+                  },
+                  {
+                        "key": "field_kontakt_contact_cards_accordion",
+                        "label": "Sekcja - Karty kontaktowe",
+                        "name": "",
+                        "type": "accordion",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        },
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0
+                  },
+                  {
+                        "key": "field_kontakt_phone_card_title",
+                        "label": "Telefon - Tytuł karty",
+                        "name": "kontakt_phone_card_title",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Numer telefonu do nas:",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                  },
+                  {
+                        "key": "field_kontakt_phone_card_value",
+                        "label": "Telefon - Numer telefonu",
+                        "name": "kontakt_phone_card_value",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "+48 000 000 000",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                  },
+                  {
+                        "key": "field_kontakt_email_card_title",
+                        "label": "E-mail - Tytuł karty",
+                        "name": "kontakt_email_card_title",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "E-mail do nas:",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                  },
+                  {
+                        "key": "field_kontakt_email_card_value",
+                        "label": "E-mail - Adres e-mail",
+                        "name": "kontakt_email_card_value",
+                        "type": "email",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "biuro@kostarykadlaciebie.pl",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                  },
+                  {
+                        "key": "field_kontakt_trips_accordion",
+                        "label": "Sekcja - Popularne wycieczki",
+                        "name": "",
+                        "type": "accordion",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        },
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 0
+                  },
+                  {
+                        "key": "field_kontakt_trips_title",
+                        "label": "Tytuł",
+                        "name": "kontakt_trips_title",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Popularne wycieczki",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                  },
+                  {
+                        "key": "field_kontakt_trips_subtitle",
+                        "label": "Podtytuł",
+                        "name": "kontakt_trips_subtitle",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "50",
+                              "class": "",
+                              "id": ""
+                        },
+                        "default_value": "Planujesz egzotyczną podróż? Zobacz najpopularniejsze wycieczki do Kostaryki, Panamy czy Nikaragui! Sprawdź programy, terminy oraz oferty.",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                  },
+                  {
+                        "key": "field_kontakt_accordion_endpoint",
+                        "label": "Endpoint",
+                        "name": "",
+                        "type": "accordion",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                              "width": "",
+                              "class": "",
+                              "id": ""
+                        },
+                        "open": 0,
+                        "multi_expand": 0,
+                        "endpoint": 1
+                  }
+            ],
+            "location": [
+                  [
+                        {
+                              "param": "post_type",
+                              "operator": "==",
+                              "value": "page"
+                        }
+                  ]
+            ],
+            "menu_order": 0,
+            "position": "normal",
+            "style": "default",
+            "label_placement": "top",
+            "instruction_placement": "label",
+            "hide_on_screen": "",
+            "active": true,
+            "description": "Grupa Kontakt z zachowanym FAQ oraz nowymi polami."
+      }
+]

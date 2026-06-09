@@ -6,11 +6,13 @@
 // Импорт стилей
 import '../css/loader.css';
 import '../css/contact-form.css';
+import '../css/kontakt-form.css';
 
 // Импорт модулей
 import { debugLog } from './utils.js';
 import { initGallery } from './gallery.js';
 import { initContactForm } from './contactForm.js';
+import { initKontaktForm } from './kontaktForm.js';
 import { initPopupManager } from './popupManager.js';
 
 /**
@@ -29,5 +31,6 @@ if (window.location.search.indexOf('debug_trip_map=1') !== -1) {
 document.addEventListener('DOMContentLoaded', () => {
   initPopupManager();    // V1 + V2 popup handlers (context-aware)
   initGallery();         // Модуль галереи
-  initContactForm();     // Formularz kontaktowy
+  initContactForm();     // Formularz kontaktowy (single oferta)
+  initKontaktForm();     // Formularz kontaktowy (strona /kontakt/)
 });
