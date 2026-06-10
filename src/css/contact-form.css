@@ -91,16 +91,19 @@
     display: flex;
     gap: 2px;
 }
+
 .trip-contact-form__label span {
     color: #f00000;
     font-size: 1rem;
     font-weight: 500;
 }
+
 .trip-contact-form__field--select {
     border-bottom: 1px solid #ecc000;
     padding-bottom: 1.25rem;
     padding-top: 1.25rem;
 }
+
 .trip-contact-form__input,
 .trip-contact-form__select,
 .trip-contact-form__textarea {
@@ -113,14 +116,15 @@
     font-weight: 500;
     line-height: 1.4em;
 }
+
 .trip-contact-form__input::placeholder,
 .trip-contact-form__textarea::placeholder {
     opacity: 1;
     color: #727272;
 }
 
-.trip-contact-form__input {
-}
+.trip-contact-form__input {}
+
 .trip-contact-form__select {
     appearance: none;
     -webkit-appearance: none;
@@ -133,8 +137,7 @@
     cursor: pointer;
 }
 
-.trip-contact-form__textarea {
-}
+.trip-contact-form__textarea {}
 
 /* Focus — yellow for all browsers */
 .trip-contact-form__input:focus,
@@ -154,17 +157,21 @@
     box-shadow: none;
     border-color: #e8e8e8;
 }
+
 .trip-contact-form__field--checkbox {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
 }
+
 .trip-contact-form__checkbox-wrapper {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 0; /* spacing handled inside label via flex gap */
-    position: relative; /* anchor for the hidden input */
+    gap: 0;
+    /* spacing handled inside label via flex gap */
+    position: relative;
+    /* anchor for the hidden input */
 }
 
 /* Custom checkbox — transparent overlay, stays in tab order */
@@ -196,7 +203,8 @@
     flex-shrink: 0;
     width: 1.25rem;
     height: 1.25rem;
-    margin-top: 0.05em; /* optical alignment with text */
+    margin-top: 0.05em;
+    /* optical alignment with text */
     background: #ffffff;
     border: 1px solid #e8e8e8;
     border-radius: 0.375rem;
@@ -207,8 +215,7 @@
 }
 
 /* Checked — box fill + SVG checkmark */
-.trip-contact-form__checkbox:checked
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__checkbox:checked+.trip-contact-form__checkbox-label::before {
     background-color: #ffcf00;
     border-color: #ffcf00;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 9' fill='none'%3E%3Cpath stroke='%23020202' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 4.5L4.5 8 11 1'/%3E%3C/svg%3E");
@@ -218,35 +225,31 @@
 }
 
 /* Hover */
-.trip-contact-form__checkbox:not(:disabled):hover
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__checkbox:not(:disabled):hover+.trip-contact-form__checkbox-label::before {
     border-color: #a3a3a3;
 }
 
 /* Checked + hover */
-.trip-contact-form__checkbox:checked:not(:disabled):hover
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__checkbox:checked:not(:disabled):hover+.trip-contact-form__checkbox-label::before {
     background-color: #ffcf00;
     border-color: #a3a3a3;
 }
 
 /* Focus — yellow for all browsers */
-.trip-contact-form__checkbox:focus
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__checkbox:focus+.trip-contact-form__checkbox-label::before {
     outline: 2px solid #ffcf00;
     /*outline-offset: 2px;*/
     box-shadow: 0 0 0 3px rgba(255, 207, 0, 0.25);
 }
 
 /* Modern browsers: suppress focus ring on mouse click, keep for keyboard */
-.trip-contact-form__checkbox:focus:not(:focus-visible)
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__checkbox:focus:not(:focus-visible)+.trip-contact-form__checkbox-label::before {
     outline: none;
     box-shadow: none;
 }
 
 /* Disabled */
-.trip-contact-form__checkbox:disabled + .trip-contact-form__checkbox-label {
+.trip-contact-form__checkbox:disabled+.trip-contact-form__checkbox-label {
     cursor: not-allowed;
     opacity: 0.5;
 }
@@ -264,21 +267,16 @@
 }
 
 /* Error + focus */
-.trip-contact-form__field--error
-    .trip-contact-form__checkbox:focus
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__field--error .trip-contact-form__checkbox:focus+.trip-contact-form__checkbox-label::before {
     outline-color: #ffcf00;
 }
 
-.trip-contact-form__field--error
-    .trip-contact-form__checkbox:focus:not(:focus-visible)
-    + .trip-contact-form__checkbox-label::before {
+.trip-contact-form__field--error .trip-contact-form__checkbox:focus:not(:focus-visible)+.trip-contact-form__checkbox-label::before {
     outline: none;
     box-shadow: none;
 }
 
-.trip-contact-form__no-dates {
-}
+.trip-contact-form__no-dates {}
 
 .trip-contact-form__field-error {
     margin-top: 2px;
@@ -299,7 +297,8 @@
     padding: 0;
     background: transparent;
     cursor: pointer;
-    border-radius: 0.625rem; /* outline следует border-radius в современных браузерах */
+    border-radius: 0.625rem;
+    /* outline следует border-radius в современных браузерах */
 }
 
 /* Keyboard focus — yellow, cross-browser */
@@ -312,6 +311,7 @@
 .trip-contact-form__submit:focus:not(:focus-visible) {
     outline: none;
 }
+
 .trip-contact-form__submit-text {
     color: #020202;
     font-size: 1rem;
@@ -344,16 +344,19 @@
     border-top-right-radius: 0.625rem;
     border-bottom-right-radius: 0.625rem;
 }
-.trip-contact-form__submit-icon > svg {
+
+.trip-contact-form__submit-icon>svg {
     transform: rotate(-90deg);
     width: 11px;
 }
+
 .trip-contact-form__submit:hover .trip-contact-form__submit-text {
     border-top-left-radius: 0.625rem;
     border-bottom-left-radius: 0.625rem;
     border-top-right-radius: 2rem;
     border-bottom-right-radius: 2rem;
 }
+
 .trip-contact-form__submit:hover .trip-contact-form__submit-icon {
     transform: translateX(4px);
     border-top-left-radius: 2rem;
@@ -362,8 +365,7 @@
     border-bottom-right-radius: 0.625rem;
 }
 
-.trip-contact-form__submit--disabled {
-}
+.trip-contact-form__submit--disabled {}
 
 /* ----------------------------------------
    MESSAGES
@@ -388,4 +390,72 @@
     color: #f00000;
     font-size: 1rem;
     font-weight: 500;
+}
+
+/* ----------------------------------------
+   MODAL VARIANT (.trip-contact-form--modal)
+   Шорткод [trip_contact_form_modal]. Значения — те же, что уже есть в этом файле.
+   База (поля, чекбокс, кнопка отправки, шрифт) наследуется как есть.
+   ---------------------------------------- */
+.trip-contact-form.trip-contact-form--modal {
+    border-radius: 0;
+    padding: 1rem;
+
+}
+
+/* Шапка как белая карточка (вместо нижней границы на жёлтом фоне) */
+.trip-contact-form--modal .trip-contact-form__header {
+    background-color: #ffffff;
+    border-radius: 0.625rem;
+    padding: 1rem;
+    border-bottom: none;
+}
+
+/* Заголовок поездки — типографика как у .trip-contact-form__price */
+.trip-contact-form--modal .trip-contact-form__title {
+    width: 100%;
+    text-align: center;
+    color: #020202;
+    font-size: clamp(1.5rem, 1.2592rem + 1.1009vw, 2.25rem);
+    font-weight: 700;
+    line-height: 1.2em;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid #ecc000;
+    margin: 0;
+    text-align: left;
+    padding-bottom: 10px;
+}
+
+/* Текст согласия 16px (в базе чекбокса 0.875rem) */
+.trip-contact-form--modal .trip-contact-form__checkbox-label {
+    font-size: 1rem;
+}
+
+/* ----------------------------------------
+   SUBMIT — планшеты/мобилки (< 1119px)
+   На тач-устройствах гасим hover (сдвиг стрелки + морфинг скруглений)
+   и растягиваем кнопку на всю ширину.
+   ---------------------------------------- */
+@media (max-width: 1118.98px) {
+    .trip-contact-form__submit {
+        width: 100%;
+    }
+
+    .trip-contact-form__submit-text {
+        flex: 1;
+        text-align: center;
+        padding-left: 1rem; /* симметрично правому → ровное центрирование на всю ширину */
+    }
+
+    /* Возвращаем resting-состояние (как без hover) */
+    .trip-contact-form__submit:hover .trip-contact-form__submit-text {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .trip-contact-form__submit:hover .trip-contact-form__submit-icon {
+        transform: translateX(-8px);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
 }

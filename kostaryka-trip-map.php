@@ -70,6 +70,12 @@ class Kostaryka_Trip_Map
         // Shortcode formularza kontaktowego
         add_shortcode("trip_contact_form", [$this, "render_contact_form"]);
 
+        // Wariant formularza dla modalki Breakdance (single oferta)
+        add_shortcode("trip_contact_form_modal", [
+            $this,
+            "render_contact_form_modal",
+        ]);
+
         // Shortcode formularza na stronie /kontakt/
         add_shortcode("contact_form", [$this, "render_kontakt_form"]);
 
@@ -311,7 +317,34 @@ class Kostaryka_Trip_Map
      *
      * @return string HTML formularza
      */
-    public function render_contact_form()
+    public function render_contact_form($atts = [])
+    {
+        return $this->render_trip_contact_form_html($atts, "inline");
+    }
+
+    /**
+     * Shortcode [trip_contact_form_modal] - wariant formularza dla modalki Breakdance.
+     *
+     * Те же поля и данные, что и [trip_contact_form]; отличается только оформление шапки
+     * (заголовок поездки в белой карточке). Разметка и JS общие — см. CSS-модификатор
+     * .trip-contact-form--modal. initContactForm() подхватывает форму по классу автоматически.
+     *
+     * @param array $atts
+     * @return string HTML formularza
+     */
+    public function render_contact_form_modal($atts = [])
+    {
+        return $this->render_trip_contact_form_html($atts, "modal");
+    }
+
+    /**
+     * Wspólny render trip-formularza dla [trip_contact_form] i [trip_contact_form_modal].
+     *
+     * @param array  $atts    Атрибуты шорткода (поддерживается key для уникальных id).
+     * @param string $variant "inline" (по умолчанию) либо "modal".
+     * @return string HTML formularza
+     */
+    private function render_trip_contact_form_html($atts = [], $variant = "inline")
     {
         if (!function_exists("get_field")) {
             return '<p class="trip-contact-form__error">Formularz niedostępny.</p>';
@@ -343,17 +376,36 @@ class Kostaryka_Trip_Map
         $has_dates = !empty($available_dates) && is_array($available_dates);
 
         $nonce = wp_create_nonce("trip_contact_form_nonce");
-        $form_id = "trip-contact-form-" . esc_attr($post_id);
+
+        // Уникальный суффикс ID: явный модификатор key (напр. [trip_contact_form key="top"]),
+        // иначе авто-счётчик. Нужен, чтобы несколько форм на одной странице не дублировали id/for.
+        $atts = shortcode_atts(["key" => ""], $atts, "trip_contact_form");
+        static $instance = 0;
+        $instance++;
+        $key = sanitize_title($atts["key"]); // "Top" -> "top"; безопасно для html id
+        if ($key === "") {
+            $key = (string) $instance; // fallback, если key не задан / пустой после санитайза
+        }
+        $form_id = "trip-contact-form-" . esc_attr($post_id) . "-" . $key;
+
+        $is_modal = $variant === "modal";
 
         ob_start();
         ?>
-        <div class="trip-contact-form"
+        <div class="trip-contact-form<?php echo $is_modal
+            ? " trip-contact-form--modal"
+            : ""; ?>"
              data-post-id="<?php echo esc_attr($post_id); ?>"
              data-post-title="<?php echo esc_attr($post_title); ?>"
              data-nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php if ($price || $days || $additional_info): ?>
+            <?php if ($is_modal || $price || $days || $additional_info): ?>
             <div class="trip-contact-form__header">
+                <?php if ($is_modal): ?>
+                <p class="trip-contact-form__title"><?php echo esc_html(
+                    $post_title,
+                ); ?></p>
+                <?php endif; ?>
                 <?php if ($price || $days): ?>
                 <div class="trip-contact-form__price-row">
                     <?php if ($price): ?>

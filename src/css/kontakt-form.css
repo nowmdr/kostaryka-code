@@ -356,3 +356,32 @@
         gap: 2rem; /* 32px — Figma desktop */
     }
 }
+
+/* ========================================
+   SUBMIT — планшеты/мобилки (< 1119px)
+   На тач-устройствах гасим hover (сдвиг стрелки + морфинг скруглений)
+   и растягиваем кнопку на всю ширину.
+   ======================================== */
+@media (max-width: 1118.98px) {
+    .kontakt-form__submit {
+        width: 100%;
+    }
+
+    .kontakt-form__submit-text {
+        flex: 1;
+        text-align: center;
+        padding-left: 1rem; /* симметрично правому → ровное центрирование на всю ширину */
+    }
+
+    /* Возвращаем resting-состояние (как без hover) */
+    .kontakt-form__submit:hover .kontakt-form__submit-text {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .kontakt-form__submit:hover .kontakt-form__submit-icon {
+        transform: translateX(-8px);
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+}
