@@ -469,6 +469,9 @@
 }
 
 .kdc-turnstile {
-  min-height: 65px; /* gives the IntersectionObserver an area to watch before the widget renders */
-  margin: 0 0 16px;
+  margin: 0; /* widget is "interaction-only": no space while it is invisible */
+}
+
+.kdc-turnstile.is-interactive {
+  margin: 0 0 16px; /* checkbox is shown: keep a gap above the submit button */
 }

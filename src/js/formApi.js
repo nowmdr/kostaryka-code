@@ -41,10 +41,15 @@ function renderTurnstile(form) {
   if (widgets.has(slot)) return true;
   if (!window.turnstile) return false;
 
+  // "interaction-only": the widget stays invisible and takes no space unless Cloudflare needs
+  // the visitor to confirm something (then the checkbox appears above the submit button).
   const id = window.turnstile.render(slot, {
     sitekey: config().turnstileSiteKey,
     language: 'pl',
     theme: 'light',
+    appearance: 'interaction-only',
+    'before-interactive-callback': () => slot.classList.add('is-interactive'),
+    'after-interactive-callback': () => slot.classList.remove('is-interactive'),
   });
   widgets.set(slot, id);
   debugLog('Turnstile rendered', form.id);
@@ -71,7 +76,7 @@ export function setupTurnstile(form) {
         tryRender();
       }
     });
-    observer.observe(turnstileSlot(form));
+    observer.observe(form); // the invisible widget has no area of its own
   }
   form.addEventListener('focusin', () => tryRender(), { once: true });
 }
