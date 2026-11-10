@@ -170,7 +170,7 @@ Each load has a token. A cancel or a new click makes an older load stop without 
 
 **Date:** 2026-11-10
 **Pages:** single Wyprawy (`body.single-oferta`: both trip forms and the modal form) and `/kontakt/` (`[contact_form]`)
-**Status:** written and built on 2026-11-10; **not deployed**; not tested on the server yet
+**Status:** written and built on 2026-11-10. The plugin zip with this backend was uploaded to the test server on 2026-11-10: plugin class, ACF group and real submissions checked; mail delivery not confirmed. The Turnstile widget change (`appearance: 'interaction-only'`) is built but **not deployed**.
 **Files:** [`includes/class-kdc-forms.php`](includes/class-kdc-forms.php) (new, class `Kostaryka_Forms`, loaded from [`kostaryka-trip-map.php`](kostaryka-trip-map.php)), [`src/js/formApi.js`](src/js/formApi.js) (new), [`src/js/contactForm.js`](src/js/contactForm.js), [`src/js/kontaktForm.js`](src/js/kontaktForm.js), [`src/css/contact-form.css`](src/css/contact-form.css). Settings, deploy order and tests: root `docs/project/forms.md`.
 
 Before this feature both front-end forms only validated the input and then faked success (`setTimeout`, `console.log`). There was no PHP handler, no e-mail and no captcha.
@@ -199,20 +199,21 @@ Before this feature both front-end forms only validated the input and then faked
 - Constants `KDC_TURNSTILE_SITE_KEY` and `KDC_TURNSTILE_SECRET_KEY` (wp-config.php) override the ACF fields. No key is stored in the repository.
 
 ### Front end
-- `formApi.js`: admin-ajax POST, lazy Turnstile render (IntersectionObserver or focus), single-use token reset, field error helper.
+- `formApi.js`: admin-ajax POST, lazy Turnstile render (IntersectionObserver on the form, or focus), single-use token reset, field error helper.
 - `contactForm.js` and `kontaktForm.js` use `formApi.js`. No `console.log` of personal data, a double-submit guard, and a network error message.
 - Config object `window.kdcForms` (ajaxUrl, Turnstile site key, Polish messages), localised in `do_enqueue_scripts()`.
 - Turnstile `api.js?render=explicit` is enqueued only on single oferta and `/kontakt/`, and only when both keys are set.
-- CSS in `contact-form.css`: `.kdc-hp` (honeypot field) and `.kdc-turnstile`.
+- CSS in `contact-form.css`: `.kdc-hp` (honeypot field), `.kdc-turnstile`, and `.kdc-turnstile.is-interactive` (16px gap above the submit button).
+- Turnstile widget appearance: `interaction-only` (decided 2026-11-10). The widget is invisible and zero height unless Cloudflare needs an interaction. The class `is-interactive` is set by the `before-interactive-callback` / `after-interactive-callback` options. Details and decision: root `docs/project/forms.md`, section "Turnstile widget".
 
 ### Decisions
 - The nonce that the shortcodes print is **not** checked. The forms are anonymous, and cached pages can hold stale nonces. Protection: honeypot, rate limit and Turnstile.
 - Submissions are not stored in the database; they are only e-mailed.
 
 ### Build and deploy
-- `npm run build` on 2026-11-10: `dist/main.js` 169 KB, `dist/main.css` 27.6 KB. `dist/` is git-ignored.
-- Upload order: PHP first (`kostaryka-trip-map.php` and `includes/class-kdc-forms.php`, by the user), then `dist/main.js` and `dist/main.css` (agent upload after approval). The new JS posts to the new actions, so the PHP must be in place first.
-- `asset_version()` appends the file modification time to the `dist` URLs; the new URLs take effect after the PHP upload.
+- `npm run build`: on 2026-11-10 the deployed `dist/main.js` was 169429 bytes. The Turnstile interaction-only build is 169594 bytes (`dist/main.js`) and 27610 bytes (`dist/main.css`), not deployed. `dist/` is git-ignored.
+- Deploy: one zip through the WordPress dashboard ("Replace current with uploaded"). The zip contains the folder `kostaryka-code` with `dist/` and `includes/`, and must not contain `node_modules` or `.git`. PHP and JS arrive together, so no upload order applies. Steps and test results: root `docs/project/forms.md`.
+- `asset_version()` appends the file modification time to the `dist` URLs, so the URLs change when the files change.
 
 ### Not tested yet
-Real submission, mail delivery, Turnstile, the ACF tabs and the rate limit (see root `docs/project/forms.md`).
+Mail delivery (not confirmed), a full Turnstile solve by a person, the interactive Turnstile case and phone behaviour of the new widget, the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). See root `docs/project/forms.md`.
