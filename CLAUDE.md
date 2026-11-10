@@ -79,6 +79,8 @@
 **Страница:** single Wyprawy (CPT `oferta`, `body.single-oferta`); п.3 затрагивает и страницу `/kontakt/`
 **Файлы:** [`kostaryka-trip-map.php`](kostaryka-trip-map.php) (рендер шорткодов), [`src/css/contact-form.css`](src/css/contact-form.css), [`src/css/kontakt-form.css`](src/css/kontakt-form.css). JS **не менялся** — формы инициализирует существующий [`initContactForm()`](src/js/contactForm.js).
 
+> **Superseded 2026-11-10:** the statement "JS was not changed" no longer holds. The forms now post to a PHP backend; see "FEATURE: Contact forms backend" at the end of this file.
+
 ### Назначение
 По дизайну форму-шорткод нужно размещать **в двух секциях** одной страницы (вверху и внизу), а при определённых условиях/устройствах — ещё и в **модалке Breakdance** (с чуть другим оформлением шапки). Плюс на тач-ширинах кнопка отправки должна вести себя иначе.
 
@@ -161,3 +163,56 @@ Each load has a token. A cancel or a new click makes an older load stop without 
 - `asset_version()` appends the plugin version and the `filemtime` of `dist/main.css` and `dist/main.js` to the enqueue URLs. Before, the fixed `?ver=2.0.0` let browsers keep old files.
 - `main.js` imports `map-modal.css` last, after the Leaflet CSS, so its rules win.
 - Build with `npm run build`. Upload: see root `docs/project/site-environment.md` → "Plugin deployment".
+
+---
+
+## 📨 FEATURE: Contact forms backend (`class-kdc-forms.php`)
+
+**Date:** 2026-11-10
+**Pages:** single Wyprawy (`body.single-oferta`: both trip forms and the modal form) and `/kontakt/` (`[contact_form]`)
+**Status:** written and built on 2026-11-10; **not deployed**; not tested on the server yet
+**Files:** [`includes/class-kdc-forms.php`](includes/class-kdc-forms.php) (new, class `Kostaryka_Forms`, loaded from [`kostaryka-trip-map.php`](kostaryka-trip-map.php)), [`src/js/formApi.js`](src/js/formApi.js) (new), [`src/js/contactForm.js`](src/js/contactForm.js), [`src/js/kontaktForm.js`](src/js/kontaktForm.js), [`src/css/contact-form.css`](src/css/contact-form.css). Settings, deploy order and tests: root `docs/project/forms.md`.
+
+Before this feature both front-end forms only validated the input and then faked success (`setTimeout`, `console.log`). There was no PHP handler, no e-mail and no captcha.
+
+### Endpoints
+- AJAX actions `kdc_trip_form` and `kdc_contact_form`, registered for logged-in and logged-out users (`wp_ajax_` and `wp_ajax_nopriv_`).
+- `formApi.js` sends a FormData POST to admin-ajax.
+
+### Request flow (PHP)
+1. Honeypot field `kdc_website`: a bot that fills it gets a fake success and nothing is sent.
+2. Rate limit: 5 requests per 10 minutes per IP, stored in the transient `kdc_form_rl_<md5(ip)>`.
+3. Validation and sanitising: name 2–120 characters, valid e-mail, message 5–5000 characters, consent required. The post ID and title come from the server, not from the visitor. A trip date must be in the trip's `trip_available_dates`, and the "no date" switch is enforced on the server too.
+4. Cloudflare Turnstile `siteverify`, only when both keys are set. The check fails closed.
+5. `wp_mail()` with plain text and `Reply-To` set to the visitor. Subjects: `[Kostaryka] Zapytanie o wyprawę: <title>` (trip form) and `[Kostaryka] Wiadomość z formularza kontaktowego` (contact form). The consent timestamp is in the body; the IP address is not.
+
+### Responses
+| HTTP status | Meaning |
+|-------------|---------|
+| 422 | Validation error, with a message per field |
+| 429 | Rate limit reached |
+| 503 | Turnstile check could not be completed |
+| 500 | Mail could not be sent |
+
+### Settings read by the code
+- ACF group `group_kdc_forms` on the options page `global-settings` ("Ustawienia Globalne"). Field names and their meaning: root `docs/project/forms.md`.
+- Constants `KDC_TURNSTILE_SITE_KEY` and `KDC_TURNSTILE_SECRET_KEY` (wp-config.php) override the ACF fields. No key is stored in the repository.
+
+### Front end
+- `formApi.js`: admin-ajax POST, lazy Turnstile render (IntersectionObserver or focus), single-use token reset, field error helper.
+- `contactForm.js` and `kontaktForm.js` use `formApi.js`. No `console.log` of personal data, a double-submit guard, and a network error message.
+- Config object `window.kdcForms` (ajaxUrl, Turnstile site key, Polish messages), localised in `do_enqueue_scripts()`.
+- Turnstile `api.js?render=explicit` is enqueued only on single oferta and `/kontakt/`, and only when both keys are set.
+- CSS in `contact-form.css`: `.kdc-hp` (honeypot field) and `.kdc-turnstile`.
+
+### Decisions
+- The nonce that the shortcodes print is **not** checked. The forms are anonymous, and cached pages can hold stale nonces. Protection: honeypot, rate limit and Turnstile.
+- Submissions are not stored in the database; they are only e-mailed.
+
+### Build and deploy
+- `npm run build` on 2026-11-10: `dist/main.js` 169 KB, `dist/main.css` 27.6 KB. `dist/` is git-ignored.
+- Upload order: PHP first (`kostaryka-trip-map.php` and `includes/class-kdc-forms.php`, by the user), then `dist/main.js` and `dist/main.css` (agent upload after approval). The new JS posts to the new actions, so the PHP must be in place first.
+- `asset_version()` appends the file modification time to the `dist` URLs; the new URLs take effect after the PHP upload.
+
+### Not tested yet
+Real submission, mail delivery, Turnstile, the ACF tabs and the rate limit (see root `docs/project/forms.md`).

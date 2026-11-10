@@ -459,3 +459,16 @@
         border-bottom-left-radius: 0;
     }
 }
+/* ===== Form protection (honeypot + Cloudflare Turnstile), shared by all forms ===== */
+.kdc-hp {
+  position: absolute !important;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.kdc-turnstile {
+  min-height: 65px; /* gives the IntersectionObserver an area to watch before the widget renders */
+  margin: 0 0 16px;
+}

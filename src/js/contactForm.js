@@ -1,9 +1,21 @@
 /**
  * Kostaryka Trip Map - Contact Form Module
- * Handles: initialization, validation, submit with console logging, message display
+ * Handles: initialization, validation, submit to admin-ajax (kdc_trip_form), Turnstile, message display
  */
 
 import { debugLog } from './utils.js';
+import {
+  msg,
+  postForm,
+  setFieldError,
+  setupTurnstile,
+  ensureTurnstile,
+  hasTurnstile,
+  getTurnstileToken,
+  resetTurnstile,
+} from './formApi.js';
+
+const PREFIX = 'trip-contact-form';
 
 /**
  * Validate a single form field
@@ -70,34 +82,6 @@ function showMessage(container, type, text) {
 }
 
 /**
- * Collect form data from a form element
- * @param {HTMLFormElement} form
- * @param {string} postTitle
- * @returns {Object}
- */
-function collectFormData(form, postTitle) {
-  const dateSelect = form.querySelector('.trip-contact-form__select');
-  const selectedOption = dateSelect
-    ? dateSelect.options[dateSelect.selectedIndex]
-    : null;
-
-  return {
-    postTitle,
-    selectedDate: dateSelect
-      ? {
-          value: dateSelect.value,
-          display: selectedOption ? selectedOption.textContent.trim() : '',
-        }
-      : null,
-    name: (form.querySelector('.trip-contact-form__input[type="text"]') || {}).value?.trim() || '',
-    email: (form.querySelector('.trip-contact-form__input[type="email"]') || {}).value?.trim() || '',
-    message: (form.querySelector('.trip-contact-form__textarea') || {}).value?.trim() || '',
-    consent: !!(form.querySelector('.trip-contact-form__checkbox') || {}).checked,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
  * Initialize a single contact form instance
  * @param {HTMLElement} wrapper - .trip-contact-form element
  */
@@ -120,9 +104,15 @@ function initFormInstance(wrapper) {
     field.addEventListener('change', () => validateField(field));
   });
 
+  let sending = false;
+
+  // Cloudflare Turnstile (only when keys are configured on the options page)
+  setupTurnstile(form);
+
   // Form submit handler
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (sending) return;
 
     // Clear previous messages
     messagesContainer.innerHTML = '';
@@ -134,29 +124,28 @@ function initFormInstance(wrapper) {
     });
 
     if (!allValid) {
-      showMessage(messagesContainer, 'error', 'Wypełnij poprawnie wszystkie wymagane pola.');
+      showMessage(messagesContainer, 'error', msg('fixFields', 'Wypełnij poprawnie wszystkie wymagane pola.'));
       // Focus first invalid field
       const firstError = form.querySelector('.trip-contact-form__field--error [required]');
       if (firstError) firstError.focus();
       return;
     }
 
-    // Disable button during processing
+    // Turnstile token must be ready (the widget solves itself in the background)
+    if (hasTurnstile(form) && !getTurnstileToken(form)) {
+      ensureTurnstile(form);
+      showMessage(messagesContainer, 'error', msg('captchaWait', 'Poczekaj chwilę na zakończenie weryfikacji i wyślij ponownie.'));
+      return;
+    }
+
+    sending = true;
     submitBtn.disabled = true;
     submitBtn.classList.add('trip-contact-form__submit--disabled');
 
-    // Collect data
-    const data = collectFormData(form, postTitle);
+    const result = await postForm('kdc_trip_form', form);
 
-    // Console log structured data (current implementation)
-    console.log('=== Trip Contact Form Submission ===');
-    console.log(JSON.stringify(data, null, 2));
-    console.log('====================================');
-
-    // TODO: Replace with AJAX call when backend integration is ready
-    // Simulate async processing
-    setTimeout(() => {
-      showMessage(messagesContainer, 'success', 'Dziękujemy! Wiadomość została wysłana.');
+    if (result.ok) {
+      showMessage(messagesContainer, 'success', result.message || msg('success', 'Dziękujemy! Wiadomość została wysłana.'));
       form.reset();
 
       // Remove all error states after reset
@@ -166,12 +155,25 @@ function initFormInstance(wrapper) {
       form.querySelectorAll('.trip-contact-form__field-error').forEach((el) => {
         el.remove();
       });
+      resetTurnstile(form);
+      debugLog('Contact form sent for post:', postTitle);
+    } else {
+      const text = result.network
+        ? msg('network', 'Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie.')
+        : result.message || msg('error', 'Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.');
+      showMessage(messagesContainer, 'error', text);
 
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('trip-contact-form__submit--disabled');
+      Object.keys(result.fields || {}).forEach((name) => {
+        const field = form.querySelector(`[name="${name}"]`);
+        if (field) setFieldError(field, PREFIX, result.fields[name]);
+      });
+      // A used or rejected token is useless: ask for a new one
+      if (result.code === 'captcha') resetTurnstile(form);
+    }
 
-      debugLog('Contact form submitted:', data);
-    }, 300);
+    sending = false;
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('trip-contact-form__submit--disabled');
   });
 
   debugLog('Contact form initialized for post:', postTitle);

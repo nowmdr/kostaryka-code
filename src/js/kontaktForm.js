@@ -1,10 +1,22 @@
 /**
  * Kostaryka — Kontakt Form Module
- * Handles: initialization, validation, submit with console logging, message display
+ * Handles: initialization, validation, submit to admin-ajax (kdc_contact_form), Turnstile, message display
  * Mirrors the pattern in contactForm.js for the /kontakt/ page form.
  */
 
 import { debugLog } from './utils.js';
+import {
+  msg,
+  postForm,
+  setFieldError,
+  setupTurnstile,
+  ensureTurnstile,
+  hasTurnstile,
+  getTurnstileToken,
+  resetTurnstile,
+} from './formApi.js';
+
+const PREFIX = 'kontakt-form';
 
 /**
  * Validate a single form field
@@ -71,21 +83,6 @@ function showMessage(container, type, text) {
 }
 
 /**
- * Collect form data from a form element
- * @param {HTMLFormElement} form
- * @returns {Object}
- */
-function collectFormData(form) {
-  return {
-    name: form.querySelector('.kontakt-form__input[type="text"]')?.value.trim() ?? '',
-    email: form.querySelector('.kontakt-form__input[type="email"]')?.value.trim() ?? '',
-    message: form.querySelector('.kontakt-form__textarea')?.value.trim() ?? '',
-    consent: !!form.querySelector('.kontakt-form__checkbox')?.checked,
-    timestamp: new Date().toISOString(),
-  };
-}
-
-/**
  * Initialize a single kontakt form instance
  * @param {HTMLElement} wrapper - .kontakt-form element
  */
@@ -107,9 +104,15 @@ function initFormInstance(wrapper) {
     field.addEventListener('change', () => validateField(field));
   });
 
+  let sending = false;
+
+  // Cloudflare Turnstile (only when keys are configured on the options page)
+  setupTurnstile(form);
+
   // Form submit handler
-  form.addEventListener('submit', (e) => {
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (sending) return;
 
     // Clear previous messages
     messagesContainer.innerHTML = '';
@@ -121,28 +124,27 @@ function initFormInstance(wrapper) {
     });
 
     if (!allValid) {
-      showMessage(messagesContainer, 'error', 'Wypełnij poprawnie wszystkie wymagane pola.');
+      showMessage(messagesContainer, 'error', msg('fixFields', 'Wypełnij poprawnie wszystkie wymagane pola.'));
       const firstError = form.querySelector('.kontakt-form__field--error [required]');
       if (firstError) firstError.focus();
       return;
     }
 
-    // Disable button during processing
+    // Turnstile token must be ready (the widget solves itself in the background)
+    if (hasTurnstile(form) && !getTurnstileToken(form)) {
+      ensureTurnstile(form);
+      showMessage(messagesContainer, 'error', msg('captchaWait', 'Poczekaj chwilę na zakończenie weryfikacji i wyślij ponownie.'));
+      return;
+    }
+
+    sending = true;
     submitBtn.disabled = true;
     submitBtn.classList.add('kontakt-form__submit--disabled');
 
-    // Collect data
-    const data = collectFormData(form);
+    const result = await postForm('kdc_contact_form', form);
 
-    // Console log structured data (current implementation — AJAX comes later)
-    console.log('=== Kontakt Form Submission ===');
-    console.log(JSON.stringify(data, null, 2));
-    console.log('================================');
-
-    // TODO: Replace with AJAX call when backend integration is ready
-    // Simulate async processing
-    setTimeout(() => {
-      showMessage(messagesContainer, 'success', 'Dziękujemy! Wiadomość została wysłana.');
+    if (result.ok) {
+      showMessage(messagesContainer, 'success', result.message || msg('success', 'Dziękujemy! Wiadomość została wysłana.'));
       form.reset();
 
       form.querySelectorAll('.kontakt-form__field--error').forEach((el) => {
@@ -151,12 +153,24 @@ function initFormInstance(wrapper) {
       form.querySelectorAll('.kontakt-form__field-error').forEach((el) => {
         el.remove();
       });
+      resetTurnstile(form);
+      debugLog('Kontakt form sent');
+    } else {
+      const text = result.network
+        ? msg('network', 'Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie.')
+        : result.message || msg('error', 'Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.');
+      showMessage(messagesContainer, 'error', text);
 
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('kontakt-form__submit--disabled');
+      Object.keys(result.fields || {}).forEach((name) => {
+        const field = form.querySelector(`[name="${name}"]`);
+        if (field) setFieldError(field, PREFIX, result.fields[name]);
+      });
+      if (result.code === 'captcha') resetTurnstile(form);
+    }
 
-      debugLog('Kontakt form submitted:', data);
-    }, 300);
+    sending = false;
+    submitBtn.disabled = false;
+    submitBtn.classList.remove('kontakt-form__submit--disabled');
   });
 
   debugLog('Kontakt form initialized');

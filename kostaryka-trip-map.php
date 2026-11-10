@@ -23,6 +23,10 @@ define("KOSTARYKA_TRIP_MAP_VERSION", "2.0.0");
 define("KOSTARYKA_TRIP_MAP_PLUGIN_DIR", plugin_dir_path(__FILE__));
 define("KOSTARYKA_TRIP_MAP_PLUGIN_URL", plugin_dir_url(__FILE__));
 
+// Backend formularzy (e-mail, Turnstile, ustawienia w "Ustawienia Globalne")
+require_once KOSTARYKA_TRIP_MAP_PLUGIN_DIR . "includes/class-kdc-forms.php";
+Kostaryka_Forms::init();
+
 /**
  * Główna klasa pluginu
  */
@@ -178,6 +182,9 @@ class Kostaryka_Trip_Map
             "nonce" => wp_create_nonce("trip_map_nonce"),
             "pluginUrl" => KOSTARYKA_TRIP_MAP_PLUGIN_URL,
         ]);
+
+        // Konfiguracja formularzy (ajaxUrl, klucz Turnstile, komunikaty) + skrypt Turnstile
+        Kostaryka_Forms::enqueue_front("kostaryka-trip-map");
     }
 
     /**
@@ -390,6 +397,11 @@ class Kostaryka_Trip_Map
 
         $nonce = wp_create_nonce("trip_contact_form_nonce");
 
+        // Przełącznik w "Ustawienia Globalne": czy termin jest opcjonalny.
+        // Bez terminów na wyprawie wysyłka jest zablokowana tylko przy wyłączonym przełączniku.
+        $date_required = !Kostaryka_Forms::allow_no_date();
+        $submit_blocked = !$has_dates && $date_required;
+
         // Уникальный суффикс ID: явный модификатор key (напр. [trip_contact_form key="top"]),
         // иначе авто-счётчик. Нужен, чтобы несколько форм на одной странице не дублировали id/for.
         $atts = shortcode_atts(["key" => ""], $atts, "trip_contact_form");
@@ -448,17 +460,20 @@ class Kostaryka_Trip_Map
 
             <form class="trip-contact-form__form" id="<?php echo $form_id; ?>" novalidate>
 
+                <input type="hidden" name="post_id" value="<?php echo esc_attr($post_id); ?>">
+
                 <div class="trip-contact-form__field trip-contact-form__field--select">
-                    <label class="trip-contact-form__label" for="<?php echo $form_id; ?>-date">
-                        Dostępne terminy <span aria-hidden="true">*</span>
-                    </label>
                     <?php if ($has_dates): ?>
+                    <label class="trip-contact-form__label" for="<?php echo $form_id; ?>-date">
+                        Dostępne terminy<?php echo $date_required ? ' <span aria-hidden="true">*</span>' : ""; ?>
+                    </label>
                     <select class="trip-contact-form__select"
                             id="<?php echo $form_id; ?>-date"
                             name="trip_date"
-                            required
-                            aria-required="true">
-                        <option value="">Wybierz termin</option>
+                            <?php echo $date_required ? 'required aria-required="true"' : ""; ?>>
+                        <option value=""><?php echo $date_required
+                            ? "Wybierz termin"
+                            : "Wybierz termin (opcjonalnie)"; ?></option>
                         <?php foreach ($available_dates as $date):
 
                             $date_name = $date["trip_date_name"] ?? "";
@@ -475,6 +490,7 @@ class Kostaryka_Trip_Map
                         endforeach; ?>
                     </select>
                     <?php else: ?>
+                    <span class="trip-contact-form__label">Dostępne terminy</span>
                     <p class="trip-contact-form__no-dates">Brak dostępnych terminów</p>
                     <?php endif; ?>
                 </div>
@@ -531,11 +547,13 @@ class Kostaryka_Trip_Map
                     </div>
                 </div>
 
-                <button class="trip-contact-form__submit<?php echo !$has_dates
+                <?php echo Kostaryka_Forms::render_protection_fields(); ?>
+
+                <button class="trip-contact-form__submit<?php echo $submit_blocked
                     ? " trip-contact-form__submit--disabled"
                     : ""; ?>"
                         type="submit"
-                        <?php echo !$has_dates ? "disabled" : ""; ?>>
+                        <?php echo $submit_blocked ? "disabled" : ""; ?>>
                     <span class="trip-contact-form__submit-text">Wyślij wiadomość</span>
                     <span class="trip-contact-form__submit-icon" aria-hidden="true">
                         <svg width="13" height="8" viewBox="0 0 13 8" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -636,6 +654,8 @@ class Kostaryka_Trip_Map
                         </label>
                     </div>
                 </div>
+
+                <?php echo Kostaryka_Forms::render_protection_fields(); ?>
 
                 <button class="kontakt-form__submit" type="submit">
                     <span class="kontakt-form__submit-text">Wyślij wiadomość</span>
