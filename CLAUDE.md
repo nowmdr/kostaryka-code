@@ -170,7 +170,7 @@ Each load has a token. A cancel or a new click makes an older load stop without 
 
 **Date:** 2026-11-10
 **Pages:** single Wyprawy (`body.single-oferta`: both trip forms and the modal form) and `/kontakt/` (`[contact_form]`)
-**Status:** written and built on 2026-11-10. The plugin zip with this backend was uploaded to the test server on 2026-11-10: plugin class, ACF group and real submissions checked; mail delivery not confirmed. The Turnstile widget change (`appearance: 'interaction-only'`) is built but **not deployed**.
+**Status:** written and built on 2026-11-10. The plugin zip with this backend was uploaded to the test server on 2026-11-10: plugin class, ACF group and real submissions checked; mail delivery not confirmed. The Turnstile widget change (`appearance: 'interaction-only'`) was deployed on 2026-11-10 (checked in headless Chrome only).
 **Files:** [`includes/class-kdc-forms.php`](includes/class-kdc-forms.php) (new, class `Kostaryka_Forms`, loaded from [`kostaryka-trip-map.php`](kostaryka-trip-map.php)), [`src/js/formApi.js`](src/js/formApi.js) (new), [`src/js/contactForm.js`](src/js/contactForm.js), [`src/js/kontaktForm.js`](src/js/kontaktForm.js), [`src/css/contact-form.css`](src/css/contact-form.css). Settings, deploy order and tests: root `docs/project/forms.md`.
 
 Before this feature both front-end forms only validated the input and then faked success (`setTimeout`, `console.log`). There was no PHP handler, no e-mail and no captcha.
@@ -211,9 +211,9 @@ Before this feature both front-end forms only validated the input and then faked
 - Submissions are not stored in the database; they are only e-mailed.
 
 ### Build and deploy
-- `npm run build`: on 2026-11-10 the deployed `dist/main.js` was 169429 bytes. The Turnstile interaction-only build is 169594 bytes (`dist/main.js`) and 27610 bytes (`dist/main.css`), not deployed. `dist/` is git-ignored.
+- `npm run build`: the first 2026-11-10 upload had `dist/main.js` at 169429 bytes. The Turnstile interaction-only build (169594 bytes `dist/main.js`, 27610 bytes `dist/main.css`) was deployed on 2026-11-10 with a newer zip. `dist/` is git-ignored.
 - Deploy: one zip through the WordPress dashboard ("Replace current with uploaded"). The zip contains the folder `kostaryka-code` with `dist/` and `includes/`, and must not contain `node_modules` or `.git`. PHP and JS arrive together, so no upload order applies. Steps and test results: root `docs/project/forms.md`.
 - `asset_version()` appends the file modification time to the `dist` URLs, so the URLs change when the files change.
 
 ### Not tested yet
-Mail delivery (not confirmed), a full Turnstile solve by a person, the interactive Turnstile case and phone behaviour of the new widget, the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). See root `docs/project/forms.md`.
+Mail delivery (not confirmed), a full Turnstile solve by a person, the normal-browser case of the new widget (no widget shown) and its phone behaviour (the interactive case was seen in headless Chrome only), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). See root `docs/project/forms.md`.
