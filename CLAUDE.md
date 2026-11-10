@@ -117,3 +117,47 @@
 
 ### Пересборка
 Правки в `src/css/` бандлятся в `dist/main.css` через импорт в [`main.js`](src/js/main.js) → нужен `npm run build` (Vite). Изменения только в `kostaryka-trip-map.php` сборки **не** требуют.
+
+---
+
+## 🗺️ FEATURE: Locations map modal (`popupManager.js`)
+
+**Date:** 2026-11-10
+**Pages:** single Wyprawy (`body.single-oferta`) and trip cards with `.trip-preview-btn` (the V1 handler runs on every page, for example `/oferta/` and the homepage)
+**Status:** accepted by the user on 2026-11-10
+**Files:** [`src/js/popupManager.js`](src/js/popupManager.js) (triggers, open flow), [`src/js/loader.js`](src/js/loader.js) (loader card), [`src/js/map.js`](src/js/map.js) (Leaflet map, marker popups), [`src/js/locations-list.js`](src/js/locations-list.js) (location cards), [`src/css/loader.css`](src/css/loader.css), [`src/css/map-modal.css`](src/css/map-modal.css) (imported last in `main.js`), [`kostaryka-trip-map.php`](kostaryka-trip-map.php) (`asset_version()`). Breakdance popup setup and deploy notes: root repo `docs/project/map-modal.md`.
+
+### Triggers
+Both triggers open the same Breakdance popup, `MAP_POPUP_ID = 399`:
+
+| Trigger | Element class | Button label | Where |
+|---------|---------------|--------------|-------|
+| V1 | `.trip-preview-btn` | "Szybki podgląd" | trip cards |
+| V2 | `.single-trip-gallery__preview-btn` | "Zobacz na mapie" | single trip page; the handler is attached only on `body.single-oferta` |
+
+V1 gets the trip ID from the card's link (slug, then REST lookup). V2 reads it from the `body.postid-…` class.
+
+### Open flow
+1. A capture-phase click listener calls `preventDefault()`. It calls `stopPropagation()` only when `window.breakdancePopupInstances[399]` exists. Without it, Breakdance keeps the click.
+2. The plugin loader appears. Its overlay is `#000000BF`, the same colour as the popup overlay, so the dimming does not jump when the popup opens. The card is white with a spinner in the palette accent colour. A click on the overlay or the Escape key cancels the load.
+3. The trip ID, Leaflet and the locations load while the popup is still closed.
+4. The loader stays for at least 900 ms (`MIN_LOADER_MS`).
+5. The loader card fades out in 180 ms (`LEAVE_MS`). Then `popup.open()` runs (Breakdance's own entrance animation) and the loader is hidden in the same tick. The hide runs in `finally`, so the loader never stays on screen, even if `open()` throws.
+6. Leaflet `invalidateSize()` runs on the next animation frame and again after 350 ms.
+
+Each load has a token. A cancel or a new click makes an older load stop without touching the modal. Errors replace the list and the map area with a message (`showError`).
+
+### Map, list and CSS
+- Clicking a location card opens its marker popup (name and photo) on the map. This is intended.
+- Location photos use a fixed ratio with `object-fit: cover`: 4:3 on desktop; at `max-width: 1119px` 8:5, and the cards are `min(17rem, 78vw)` wide.
+- Marker popup: `min(200px, 60vw)` wide, 4:3 photo, `keepInView` pans the map so the popup stays inside it.
+- At `max-width: 1119px` the close button gets `--closeButtonOutsideOffset: 36px` and `translate(-125%, -50px)`, with `z-index: 1100`. The map container has `isolation: isolate`, so the Leaflet panes (z-index 400–1000) cannot cover it.
+- Image URLs and names go through `escapeHtml` in the list and in the marker popup.
+- The list's click listener is a named function, so re-rendering does not add a second copy.
+- Loader classes are scoped under `.trip-map-loader`.
+- `map-modal.css` selectors use `.bde-popup-399-100`, so they depend on the popup ID as well.
+
+### Build and cache
+- `asset_version()` appends the plugin version and the `filemtime` of `dist/main.css` and `dist/main.js` to the enqueue URLs. Before, the fixed `?ver=2.0.0` let browsers keep old files.
+- `main.js` imports `map-modal.css` last, after the Leaflet CSS, so its rules win.
+- Build with `npm run build`. Upload: see root `docs/project/site-environment.md` → "Plugin deployment".
