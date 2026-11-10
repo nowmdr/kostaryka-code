@@ -1,0 +1,106 @@
+/**
+ * Kostaryka Trip Map - Map modal (Breakdance popup 399) overrides
+ *
+ * The layout of the popup (bottom sheet, locations strip, map) lives in the popup's own
+ * Breakdance settings and custom CSS. Only the close button override is kept here:
+ * its translate is not responsive in Breakdance, and Breakdance re-emits the desktop
+ * value for every narrower breakpoint after the popup's custom CSS. The doubled class
+ * raises specificity so the override wins in every order.
+ *
+ * Up to 1119px the button sits above the sheet, same as in the form popup (1139).
+ */
+
+@media (max-width: 1119px) {
+    .bde-popup-399-100 .breakdance-popup .breakdance-popup-close-button.breakdance-popup-close-button {
+        --closeButtonOutsideOffset: 36px;
+        transform: translate(-125%, -50px);
+    }
+}
+
+/* ------------------------------------------------------------------
+ * Location cards (left panel on desktop, bottom strip up to 1119px)
+ * Photos come in different sizes and proportions, so every photo gets a fixed
+ * ratio and is cropped with object-fit. The selectors are one class stronger
+ * than the popup's own custom CSS, so these values win.
+ * ------------------------------------------------------------------ */
+
+.bde-popup-399-100 .location-item .location-item__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 2rem;
+    background: var(--bde-palette-color-1-ba1ce0c0-014e-436f-82db-2803db82cb51, #F6F7F7);
+}
+
+.bde-popup-399-100 .location-item .location-item__title {
+    align-items: flex-start;
+}
+
+.bde-popup-399-100 .location-item__icon {
+    flex: none;
+    margin-top: .25rem;
+}
+
+@media (max-width: 1119px) {
+    .bde-popup-399-100 .locations-wrapper__list .location-item {
+        flex: 0 0 min(17rem, 78vw);
+    }
+
+    .bde-popup-399-100 .location-item .location-item__image {
+        aspect-ratio: 8 / 5;
+        border-radius: 1.25rem;
+    }
+
+    .bde-popup-399-100 .location-item .location-item__title {
+        gap: .375rem;
+    }
+
+    .bde-popup-399-100 .location-item__icon {
+        margin-top: .125rem;
+    }
+}
+
+/* ------------------------------------------------------------------
+ * Close button above the map layers
+ * Leaflet panes use z-index 400 to 1000. The map is isolated so they stay inside it,
+ * and the button gets an explicit z-index in any case.
+ * ------------------------------------------------------------------ */
+
+.bde-popup-399-100 #map-container {
+    isolation: isolate;
+}
+
+.bde-popup-399-100 .breakdance-popup .breakdance-popup-close-button {
+    z-index: 1100;
+}
+
+/* ------------------------------------------------------------------
+ * Marker popup on the map (name + photo)
+ * Same width and photo ratio for every location.
+ * ------------------------------------------------------------------ */
+
+.map-popup {
+    width: min(200px, 60vw);
+}
+
+.map-popup__image {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: .5rem;
+    background: var(--bde-palette-color-1-ba1ce0c0-014e-436f-82db-2803db82cb51, #F6F7F7);
+}
+
+.map-popup__title {
+    margin: 0;
+    color: var(--bde-palette-color-1-602433de-e175-4e7a-9497-7d71bea18f7b, #020202);
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.3;
+}

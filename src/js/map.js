@@ -19,10 +19,10 @@ function createPopupContent(loc) {
   let html = '<div class="map-popup">';
 
   if (loc.image) {
-    html += `<img src="${loc.image}" alt="${escapeHtml(loc.name)}" style="border-radius: 8px; margin-bottom: 0.5rem;">`;
+    html += `<img class="map-popup__image" src="${escapeHtml(loc.image)}" alt="${escapeHtml(loc.name)}">`;
   }
 
-  html += `<h4 style="margin: 0; font-size: 1rem;">${escapeHtml(loc.name)}</h4>`;
+  html += `<h4 class="map-popup__title">${escapeHtml(loc.name)}</h4>`;
   html += '</div>';
 
   return html;
@@ -84,8 +84,10 @@ export function initMap(locations) {
 
     // Добавить маркеры
     locationsWithCoords.forEach((loc, index) => {
+      // keepInView: pan the map after it moves so the whole popup stays inside it
       const marker = L.marker([loc.latitude, loc.longitude]).bindPopup(
-        createPopupContent(loc)
+        createPopupContent(loc),
+        { keepInView: true, autoPanPadding: [16, 16] }
       );
 
       marker.addTo(markersLayer);
@@ -105,6 +107,15 @@ export function initMap(locations) {
   } catch (error) {
     console.error('Error initializing map:', error);
     showError('Błąd inicjalizacji mapy: ' + error.message);
+  }
+}
+
+/**
+ * Пересчитать размер карты (после показа попапа или окончания анимации)
+ */
+export function refreshMap() {
+  if (map) {
+    map.invalidateSize();
   }
 }
 

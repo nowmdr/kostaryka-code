@@ -18,7 +18,7 @@ function createLocationItemHTML(loc, index) {
   let html = `<div class="location-item" data-index="${index}">`;
 
   if (loc.image) {
-    html += `<img class="location-item__image" src="${loc.image}" alt="${escapeHtml(loc.name)}">`;
+    html += `<img class="location-item__image" src="${escapeHtml(loc.image)}" alt="${escapeHtml(loc.name)}">`;
   }
 
   html += '<div class="location-item__content">';
@@ -60,34 +60,43 @@ export function renderLocationsList(locations) {
 }
 
 /**
+ * Click on a location card: highlight it and open its marker on the map.
+ * A named function, so addEventListener does not add a second copy
+ * each time the list is rendered again.
+ * @param {MouseEvent} e
+ */
+function handleLocationClick(e) {
+  const locationsList = e.currentTarget;
+  const locationItem = e.target.closest('.location-item');
+  if (!locationItem) return;
+
+  const index = parseInt(locationItem.dataset.index, 10);
+
+  // Убрать active со всех элементов
+  const allItems = locationsList.querySelectorAll('.location-item');
+  allItems.forEach((item) => {
+    item.classList.remove('active');
+  });
+
+  // Добавить к кликнутому
+  locationItem.classList.add('active');
+
+  // Фокус на маркере
+  const markers = getMarkers();
+  const map = getMap();
+
+  if (markers[index] && map) {
+    markers[index].openPopup();
+    map.setView(markers[index].getLatLng(), 10);
+  }
+}
+
+/**
  * Настроить обработчики кликов для списка локаций
  * @param {HTMLElement} locationsList - контейнер списка
  */
 function setupLocationClickHandlers(locationsList) {
   if (!locationsList) return;
 
-  locationsList.addEventListener('click', (e) => {
-    const locationItem = e.target.closest('.location-item');
-    if (!locationItem) return;
-
-    const index = parseInt(locationItem.dataset.index, 10);
-
-    // Убрать active со всех элементов
-    const allItems = locationsList.querySelectorAll('.location-item');
-    allItems.forEach((item) => {
-      item.classList.remove('active');
-    });
-
-    // Добавить к кликнутому
-    locationItem.classList.add('active');
-
-    // Фокус на маркере
-    const markers = getMarkers();
-    const map = getMap();
-
-    if (markers[index] && map) {
-      markers[index].openPopup();
-      map.setView(markers[index].getLatLng(), 10);
-    }
-  });
+  locationsList.addEventListener('click', handleLocationClick);
 }

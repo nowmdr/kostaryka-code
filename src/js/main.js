@@ -15,6 +15,7 @@ import { initContactForm } from './contactForm.js';
 import { initKontaktForm } from './kontaktForm.js';
 import { initPopupManager } from './popupManager.js';
 import { initTripDescriptionModal } from './tripDescriptionModal.js';
+import '../css/map-modal.css'; // after the Leaflet CSS (pulled in via popupManager) so it stays last
 
 /**
  * Debug info

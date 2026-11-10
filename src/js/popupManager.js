@@ -9,7 +9,7 @@
  *     ID extracted from body.postid-XXX class directly
  */
 
-import { showGlobalLoader, hideGlobalLoader, showError } from './loader.js';
+import { showGlobalLoader, hideGlobalLoader, fadeOutLoaderCard, showError } from './loader.js';
 import { ensureLeafletLoaded } from './leaflet-loader.js';
 import {
   extractPostSlugFromButton,
@@ -17,7 +17,7 @@ import {
   getPostIdFromSlug,
   loadTripLocations
 } from './ajax.js';
-import { initMap } from './map.js';
+import { initMap, refreshMap } from './map.js';
 import { renderLocationsList } from './locations-list.js';
 import { debugLog } from './utils.js';
 
@@ -30,19 +30,47 @@ function isSingleOferta() {
 }
 
 /**
- * Load and render map content (locations list + map)
- * @param {number} tripId - post ID
+ * ID попапа Breakdance «Quick View» (локации + карта). Оба триггера
+ * (V1 и V2) открывают именно его.
  */
-async function loadAndRenderMapContent(tripId) {
-  showGlobalLoader('Ładowanie mapy lokacji...');
+const MAP_POPUP_ID = 399;
+
+// The loader stays at least this long, so a fast response does not make it flash.
+const MIN_LOADER_MS = 900;
+
+// Каждая загрузка получает номер; отмена или новый клик делают старый номер устаревшим.
+let loadToken = 0;
+
+/**
+ * @returns {Object|null} экземпляр попапа Breakdance или null, если он не инициализирован
+ */
+function getMapPopup() {
+  const instances = window.breakdancePopupInstances;
+  return (instances && instances[MAP_POPUP_ID]) || null;
+}
+
+/**
+ * Open the map popup: show the loader first, load data while the popup is still
+ * closed, then open the popup with its native Breakdance entrance animation.
+ * @param {Function} resolveTripId - async function returning the trip post ID
+ */
+async function openMapModal(resolveTripId) {
+  const token = ++loadToken;
+  const minWait = new Promise((resolve) => setTimeout(resolve, MIN_LOADER_MS));
+
+  showGlobalLoader('Ładowanie mapy lokacji...', () => {
+    loadToken++;
+  });
 
   try {
+    const tripId = await resolveTripId();
+
     const [, locationsData] = await Promise.all([
       ensureLeafletLoaded(),
       loadTripLocations(tripId)
     ]);
 
-    hideGlobalLoader();
+    if (token !== loadToken) return; // cancelled or superseded
 
     if (locationsData && locationsData.length > 0) {
       renderLocationsList(locationsData);
@@ -51,9 +79,53 @@ async function loadAndRenderMapContent(tripId) {
       showError('Brak lokacji dla tej wyprawy');
     }
   } catch (error) {
+    if (token !== loadToken) return;
     console.error('Błąd:', error);
-    hideGlobalLoader();
     showError(error.message || 'Wystąpił błąd podczas ładowania danych');
+  }
+
+  await minWait;
+  if (token !== loadToken) return;
+
+  await fadeOutLoaderCard();
+  if (token !== loadToken) return;
+
+  revealMapModal();
+}
+
+/**
+ * Open the popup and drop the loader in the same tick. The loader overlay has the
+ * same colour as the popup overlay, so the dimming does not change between them.
+ */
+function revealMapModal() {
+  try {
+    const popup = getMapPopup();
+
+    if (popup && !popup.isOpen()) {
+      popup.open();
+    }
+  } catch (error) {
+    console.error('Błąd otwierania okna:', error);
+  } finally {
+    // The loader must never stay on screen, even if opening the popup fails
+    hideGlobalLoader();
+  }
+
+  // Leaflet must recalculate the container size once the popup is visible
+  // and again after the entrance animation.
+  requestAnimationFrame(refreshMap);
+  setTimeout(refreshMap, 350);
+}
+
+/**
+ * Stop Breakdance from opening the popup on click: we open it ourselves
+ * after the data has loaded. Without a popup instance Breakdance keeps control.
+ * @param {Event} e
+ */
+function takeOverClick(e) {
+  e.preventDefault();
+  if (getMapPopup()) {
+    e.stopPropagation();
   }
 }
 
@@ -63,18 +135,13 @@ async function loadAndRenderMapContent(tripId) {
  * @param {Event} e
  * @param {HTMLElement} clickedElement
  */
-async function handleV1ButtonClick(e, clickedElement) {
-  e.preventDefault();
+function handleV1ButtonClick(e, clickedElement) {
+  takeOverClick(e);
 
-  try {
+  openMapModal(async () => {
     const postSlug = extractPostSlugFromButton(clickedElement);
-    const tripId = await getPostIdFromSlug(postSlug);
-    await loadAndRenderMapContent(tripId);
-  } catch (error) {
-    console.error('Błąd:', error);
-    hideGlobalLoader();
-    showError(error.message || 'Wystąpił błąd podczas ładowania danych');
-  }
+    return getPostIdFromSlug(postSlug);
+  });
 }
 
 /**
@@ -82,22 +149,18 @@ async function handleV1ButtonClick(e, clickedElement) {
  * Extracts post ID directly from body.postid-XXX class.
  * @param {Event} e
  */
-async function handleV2ButtonClick(e) {
-  e.preventDefault();
+function handleV2ButtonClick(e) {
+  takeOverClick(e);
 
-  try {
+  openMapModal(async () => {
     const tripId = extractPostIdFromBody();
 
     if (!tripId) {
       throw new Error('Nie udało się pobrać ID wyprawy ze strony');
     }
 
-    await loadAndRenderMapContent(tripId);
-  } catch (error) {
-    console.error('Błąd:', error);
-    hideGlobalLoader();
-    showError(error.message || 'Wystąpił błąd podczas ładowania danych');
-  }
+    return tripId;
+  });
 }
 
 /**
@@ -109,7 +172,7 @@ function initV1Handlers() {
     const button = e.target.closest('.trip-preview-btn, .trip-preview-btn button');
     if (!button) return;
     handleV1ButtonClick(e, button);
-  });
+  }, true); // capture phase: runs before Breakdance's popup handler
 
   debugLog('Popup Manager: V1 handlers initialized (.trip-preview-btn)');
 }
@@ -126,7 +189,7 @@ function initV2Handlers() {
     return;
   }
 
-  button.addEventListener('click', handleV2ButtonClick);
+  button.addEventListener('click', handleV2ButtonClick, true); // capture phase
 
   debugLog('Popup Manager: V2 handler initialized (.single-trip-gallery__preview-btn)');
 }
