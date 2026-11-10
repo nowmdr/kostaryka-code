@@ -138,6 +138,19 @@ class Kostaryka_Trip_Map
     }
 
     /**
+     * Wersja pliku dla cache bustingu: wersja wtyczki + czas modyfikacji pliku,
+     * dzięki czemu po wgraniu nowego dist/ przeglądarka pobiera świeże pliki.
+     */
+    private function asset_version($relative_path)
+    {
+        $file = KOSTARYKA_TRIP_MAP_PLUGIN_DIR . $relative_path;
+
+        return file_exists($file)
+            ? KOSTARYKA_TRIP_MAP_VERSION . "." . filemtime($file)
+            : KOSTARYKA_TRIP_MAP_VERSION;
+    }
+
+    /**
      * Ładowanie skryptów i stylów
      */
     private function do_enqueue_scripts()
@@ -147,7 +160,7 @@ class Kostaryka_Trip_Map
             "kostaryka-trip-map",
             KOSTARYKA_TRIP_MAP_PLUGIN_URL . "dist/main.css",
             [],
-            KOSTARYKA_TRIP_MAP_VERSION,
+            $this->asset_version("dist/main.css"),
         );
 
         // JS z Vite bundle (wszystkie moduły + Leaflet)
@@ -155,7 +168,7 @@ class Kostaryka_Trip_Map
             "kostaryka-trip-map",
             KOSTARYKA_TRIP_MAP_PLUGIN_URL . "dist/main.js",
             [],
-            KOSTARYKA_TRIP_MAP_VERSION,
+            $this->asset_version("dist/main.js"),
             true,
         );
 
