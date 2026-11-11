@@ -170,7 +170,7 @@ Each load has a token. A cancel or a new click makes an older load stop without 
 
 **Date:** 2026-11-10
 **Pages:** single Wyprawy (`body.single-oferta`: both trip forms and the modal form) and `/kontakt/` (`[contact_form]`)
-**Status:** on the test server since 2026-11-10 (zip upload; plugin class, ACF group and real submissions checked; mail delivery not confirmed). The Turnstile change of 2026-11-10 (`appearance: 'interaction-only'`) is deployed, checked in headless Chrome only. The change of 2026-11-11 (challenge starts on submit) is built and **not deployed**. No test submissions and no test mails until the migration (decision 2026-11-11).
+**Status:** on the test server since 2026-11-10 (zip upload; plugin class, ACF group and real submissions checked; mail delivery not confirmed). The Turnstile change of 2026-11-10 (`appearance: 'interaction-only'`) is deployed, checked in headless Chrome only. The change of 2026-11-11 (challenge starts on submit) is built and deployed (`dist/main.js` 170341 bytes, checked read-only). No test submissions and no test mails until the migration (decision 2026-11-11).
 **Files:** [`includes/class-kdc-forms.php`](includes/class-kdc-forms.php) (new, class `Kostaryka_Forms`, loaded from [`kostaryka-trip-map.php`](kostaryka-trip-map.php)), [`src/js/formApi.js`](src/js/formApi.js) (new), [`src/js/contactForm.js`](src/js/contactForm.js), [`src/js/kontaktForm.js`](src/js/kontaktForm.js), [`src/css/contact-form.css`](src/css/contact-form.css). Settings, deploy order and tests: root `docs/project/forms.md`.
 
 Before this feature both front-end forms only validated the input and then faked success (`setTimeout`, `console.log`). There was no PHP handler, no e-mail and no captcha.
@@ -224,9 +224,9 @@ Before this feature both front-end forms only validated the input and then faked
 - No test submissions and no test mails until the migration (user decision, 2026-11-11). See root `docs/project/forms.md`, section "Mail delivery".
 
 ### Build and deploy
-- `npm run build` sizes: `dist/main.js` 169429 bytes (first upload, 2026-11-10); 169594 bytes with `dist/main.css` 27610 bytes (interaction-only build, deployed 2026-11-10); 170341 bytes with `dist/main.css` 27610 bytes (build of 2026-11-11, not deployed; CSS unchanged). `dist/` is git-ignored.
+- `npm run build` sizes: `dist/main.js` 169429 bytes (first upload, 2026-11-10); 169594 bytes with `dist/main.css` 27610 bytes (interaction-only build, deployed 2026-11-10); 170341 bytes with `dist/main.css` 27610 bytes (build of 2026-11-11, deployed the same day; CSS unchanged). `dist/` is git-ignored.
 - Deploy: one zip through the WordPress dashboard ("Replace current with uploaded"). The zip contains the folder `kostaryka-code` with `dist/` and `includes/`, and must not contain `node_modules` or `.git`. PHP and JS arrive together, so no upload order applies. Steps and test results: root `docs/project/forms.md`.
 - `asset_version()` appends the file modification time to the `dist` URLs, so the URLs change when the files change.
 
 ### Not tested yet
-Mail delivery (not confirmed), a successful Turnstile solve with the 2026-11-11 build, the new widget on real phones and desktop browsers (not deployed yet), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). The interactive challenge was seen in headless Chrome only. See root `docs/project/forms.md`.
+Mail delivery (not confirmed), a successful Turnstile solve with the 2026-11-11 build, the new widget on real phones and desktop browsers (deployed 2026-11-11, not checked yet), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). The interactive challenge was seen in headless Chrome only. See root `docs/project/forms.md`.
