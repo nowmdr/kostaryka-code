@@ -229,4 +229,4 @@ Before this feature both front-end forms only validated the input and then faked
 - `asset_version()` appends the file modification time to the `dist` URLs, so the URLs change when the files change.
 
 ### Not tested yet
-Mail delivery (not confirmed), a successful Turnstile solve with the 2026-11-11 build, the new widget on real phones and desktop browsers (deployed 2026-11-11, not checked yet), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). The interactive challenge was seen in headless Chrome only. See root `docs/project/forms.md`.
+Mail delivery (not confirmed: a real submission on 2026-11-11 returned success, but no mail arrived), the widget on the inline desktop-width form (the 2026-11-11 test was in the popup form, device not specified), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). Verified on 2026-11-11 in a desktop browser: Turnstile solve and success path. See root `docs/project/forms.md`, section "Test results (user, real browser, 2026-11-11)".
