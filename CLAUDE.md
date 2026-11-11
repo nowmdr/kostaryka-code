@@ -244,3 +244,19 @@ Mail delivery (not confirmed: a real submission on 2026-11-11 returned success, 
 - Colours: local custom properties `--kf-*` on `.kontakt-form`. Brand colours use the Breakdance palette variables with the old hex as fallback; border, muted, error and success have no palette entry and stay as hex values.
 - `autocomplete="name"` and `autocomplete="email"` on the two inputs (Chrome issue "element doesn't have an autocomplete attribute").
 - Not changed: validation, Turnstile flow and the backend ([`includes/class-kdc-forms.php`](includes/class-kdc-forms.php)).
+
+---
+
+## 🍪 FEATURE: Cookie consent (`class-kdc-consent.php`, `consent.js`)
+
+**Date:** 2026-11-11
+**Pages:** every public page (not only where `main.js` loads)
+**Status:** the user confirmed on the test server that the banner works. The editable banner texts were added afterwards and are not checked on the server yet.
+**Files:** [`includes/class-kdc-consent.php`](includes/class-kdc-consent.php) (class `Kostaryka_Consent`, loaded from [`kostaryka-trip-map.php`](kostaryka-trip-map.php)), [`src/js/consent.js`](src/js/consent.js), [`src/css/consent.css`](src/css/consent.css), second Vite entry `consent` in [`vite.config.js`](vite.config.js) (output `dist/consent.js`, `dist/consent.css`). Full description, settings and tests: root `docs/project/cookie-consent.md`.
+
+- Google Analytics 4 loads only after "Akceptuję". The choice is kept in the cookie `kdc_consent` for 180 days. Withdrawal deletes the `_ga*` cookies and reloads the page.
+- ACF group "Cookies i analityka" on the options page "Ustawienia Globalne": GA measurement ID (or constant `KDC_GA_MEASUREMENT_ID`), the switch "show the banner without an ID" (not saved = on, temporary), banner title and banner text (empty = default text).
+- Reopen link: `<a href="#cookie-settings">` (in the Breakdance footer) or the shortcode `[kdc_cookie_settings]`.
+- **Rule for every standalone entry in this plugin: wrap the module body in an IIFE.** The built files are classic scripts that share one global scope with `dist/main.js`; unwrapped minified names (`t`, `e`) clash and the script silently stops ("Identifier 't' has already been declared"). This happened on the first upload.
+- Build: `npm run build`; the zip needs `dist/consent.js` and `dist/consent.css` as well as `includes/`.
+

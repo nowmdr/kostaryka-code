@@ -27,6 +27,10 @@ define("KOSTARYKA_TRIP_MAP_PLUGIN_URL", plugin_dir_url(__FILE__));
 require_once KOSTARYKA_TRIP_MAP_PLUGIN_DIR . "includes/class-kdc-forms.php";
 Kostaryka_Forms::init();
 
+// Zgoda na cookies (Google Analytics dopiero po akceptacji)
+require_once KOSTARYKA_TRIP_MAP_PLUGIN_DIR . "includes/class-kdc-consent.php";
+Kostaryka_Consent::init();
+
 /**
  * Główna klasa pluginu
  */

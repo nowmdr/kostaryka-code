@@ -12,7 +12,9 @@ export default defineConfig({
     assetsInlineLimit: 0, // Отключаем inline для всех assets - копируем файлы
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, 'src/js/main.js')
+        main: path.resolve(__dirname, 'src/js/main.js'),
+        // Cookie consent: separate small bundle, loaded on every public page
+        consent: path.resolve(__dirname, 'src/js/consent.js')
       },
       output: {
         entryFileNames: '[name].js',

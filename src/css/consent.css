@@ -1,0 +1,157 @@
+/**
+ * Cookie consent banner - a floating bar in the style of the site header
+ * (light surface, 16px radius, 14px from the screen edge, yellow action).
+ * Both buttons have the same size and weight, so refusing is as easy as accepting.
+ */
+.kdc-cookie {
+    --kdc-yellow: var(--bde-palette-color-1-8efe9942-2ef7-477f-b13d-ee42a4caa60c, #ffcf00);
+    --kdc-surface: var(--bde-palette-color-1-ba1ce0c0-014e-436f-82db-2803db82cb51, #f6f7f7);
+    --kdc-text: var(--bde-palette-color-1-602433de-e175-4e7a-9497-7d71bea18f7b, #020202);
+    --kdc-muted: #4a4a4a;
+
+    position: fixed;
+    z-index: 99990;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 18px 16px;
+    border-radius: 16px;
+    background-color: var(--kdc-surface);
+    color: var(--kdc-text);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+    font-family: inherit;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.kdc-cookie[hidden] {
+    display: none;
+}
+
+.kdc-cookie.is-visible {
+    opacity: 1;
+    transform: none;
+}
+
+.kdc-cookie__title {
+    margin: 0 0 4px;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 700;
+}
+
+.kdc-cookie__desc {
+    margin: 0;
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--kdc-muted);
+}
+
+.kdc-cookie__link {
+    color: var(--kdc-text);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.kdc-cookie__status {
+    margin: 8px 0 0;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.kdc-cookie__actions {
+    display: flex;
+    gap: 12px;
+}
+
+.kdc-cookie__btn {
+    flex: 1 1 0;
+    box-sizing: border-box;
+    min-width: 0;
+    height: 50px;
+    padding: 0 20px;
+    border: 2px solid var(--kdc-text);
+    border-radius: 0.625rem;
+    font-family: inherit;
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 600;
+    color: var(--kdc-text);
+    cursor: pointer;
+}
+
+.kdc-cookie__btn--accept {
+    background-color: var(--kdc-yellow);
+    border-color: var(--kdc-yellow);
+}
+
+.kdc-cookie__btn--deny {
+    background-color: transparent;
+}
+
+.kdc-cookie__btn:focus-visible,
+.kdc-cookie__link:focus-visible {
+    outline: 3px solid var(--kdc-text);
+    outline-offset: 2px;
+}
+
+@media (hover: hover) {
+    .kdc-cookie__btn--deny:hover {
+        background-color: rgba(2, 2, 2, 0.08);
+    }
+
+    .kdc-cookie__btn--accept:hover {
+        filter: brightness(0.94);
+    }
+}
+
+@media (min-width: 768px) {
+    .kdc-cookie {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        gap: 32px;
+        padding: 20px 24px;
+    }
+
+    .kdc-cookie__desc {
+        font-size: 15px;
+        line-height: 22px;
+    }
+
+    .kdc-cookie__actions {
+        flex: 0 0 auto;
+    }
+
+    .kdc-cookie__btn {
+        flex: 0 0 auto;
+        min-width: 150px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .kdc-cookie {
+        transition: none;
+        transform: none;
+    }
+}
+
+/* [kdc_cookie_settings] shortcode: looks like a text link. */
+.kdc-cookie-settings {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
