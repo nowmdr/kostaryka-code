@@ -603,6 +603,7 @@ class Kostaryka_Trip_Map
                             type="text"
                             id="<?php echo esc_attr($form_id); ?>-name"
                             name="name"
+                            autocomplete="name"
                             placeholder="Podaj imię i nazwisko"
                             required
                             aria-required="true">
@@ -618,6 +619,7 @@ class Kostaryka_Trip_Map
                             type="email"
                             id="<?php echo esc_attr($form_id); ?>-email"
                             name="email"
+                            autocomplete="email"
                             placeholder="Podaj adres e-mail"
                             required
                             aria-required="true">

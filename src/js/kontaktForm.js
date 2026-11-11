@@ -103,6 +103,17 @@ function initFormInstance(wrapper) {
   });
 
   let sending = false;
+  const submitText = submitBtn.querySelector('.kontakt-form__submit-text');
+  const submitLabel = submitText ? submitText.textContent : '';
+
+  // Busy state: disabled button, "Wysyłanie…" label and aria-busy for screen readers
+  const setSending = (busy) => {
+    sending = busy;
+    submitBtn.disabled = busy;
+    submitBtn.classList.toggle('kontakt-form__submit--disabled', busy);
+    submitBtn.setAttribute('aria-busy', busy ? 'true' : 'false');
+    if (submitText) submitText.textContent = busy ? msg('sending', 'Wysyłanie…') : submitLabel;
+  };
 
   // Form submit handler
   form.addEventListener('submit', async (e) => {
@@ -125,9 +136,7 @@ function initFormInstance(wrapper) {
       return;
     }
 
-    sending = true;
-    submitBtn.disabled = true;
-    submitBtn.classList.add('kontakt-form__submit--disabled');
+    setSending(true);
 
     // Cloudflare Turnstile (only when both keys are set on the options page): the challenge
     // starts now and is invisible unless Cloudflare needs the visitor to confirm something.
@@ -138,9 +147,7 @@ function initFormInstance(wrapper) {
       if (!token) {
         showMessage(messagesContainer, 'error', msg('captchaFailed', 'Nie udało się zweryfikować zabezpieczenia. Odśwież stronę i spróbuj ponownie.'));
         resetTurnstile(form);
-        sending = false;
-        submitBtn.disabled = false;
-        submitBtn.classList.remove('kontakt-form__submit--disabled');
+        setSending(false);
         return;
       }
       messagesContainer.innerHTML = '';
@@ -175,9 +182,7 @@ function initFormInstance(wrapper) {
       if (result.code === 'captcha' || !Object.keys(result.fields || {}).length) resetTurnstile(form);
     }
 
-    sending = false;
-    submitBtn.disabled = false;
-    submitBtn.classList.remove('kontakt-form__submit--disabled');
+    setSending(false);
   });
 
   debugLog('Kontakt form initialized');

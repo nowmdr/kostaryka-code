@@ -12,9 +12,23 @@
    SECTION WRAPPER
    ---------------------------------------- */
 .kontakt-form {
+    /* Colours: Breakdance palette variables with the same hex as fallback.
+       Border, muted, error and success have no palette entry yet. */
+    --kf-yellow: var(--bde-palette-color-1-8efe9942-2ef7-477f-b13d-ee42a4caa60c, #ffcf00);
+    --kf-surface: var(--bde-palette-color-1-ba1ce0c0-014e-436f-82db-2803db82cb51, #f6f7f7);
+    --kf-text: var(--bde-palette-color-1-602433de-e175-4e7a-9497-7d71bea18f7b, #020202);
+    --kf-white: var(--bde-palette-color-1-a0ac5440-af9a-47d7-a90b-f96c926eeb2c, #ffffff);
+    --kf-border: #e8e8e8;
+    --kf-border-hover: #a3a3a3;
+    --kf-muted: #727272;
+    --kf-error: #f00000;
+    --kf-success: #469b7c;
+}
+
+.kontakt-form {
     padding: 24px 20px;
     border-radius: 20px;
-    background-color: #f6f7f7;
+    background-color: var(--kf-surface);
 }
 
 /* ----------------------------------------
@@ -42,7 +56,7 @@
 }
 
 .kontakt-form__label {
-    color: #020202;
+    color: var(--kf-text);
     font-size: 1rem; /* 16px — Figma mobile */
     font-weight: 500;
     line-height: 1.4em;
@@ -51,18 +65,18 @@
 }
 
 .kontakt-form__label span {
-    color: #f00000;
+    color: var(--kf-error);
     font-size: 1rem;
     font-weight: 500;
 }
 
 .kontakt-form__input,
 .kontakt-form__textarea {
-    background: #ffffff;
-    border: 1px solid #e8e8e8;
+    background: var(--kf-white);
+    border: 1px solid var(--kf-border);
     padding: 0.875rem; /* 14px — Figma */
     border-radius: 0.625rem; /* 10px */
-    color: #020202;
+    color: var(--kf-text);
     font-family: inherit;
     font-size: 1rem; /* 16px — Figma mobile */
     font-weight: 500;
@@ -77,16 +91,16 @@
 .kontakt-form__input::placeholder,
 .kontakt-form__textarea::placeholder {
     opacity: 1;
-    color: #727272;
+    color: var(--kf-muted);
 }
 
 /* Focus — yellow for all browsers */
 .kontakt-form__input:focus,
 .kontakt-form__textarea:focus {
-    outline: 2px solid #ffcf00;
+    outline: 2px solid var(--kf-yellow);
     outline-offset: 2px;
-    border-color: #ffcf00;
-    box-shadow: 0 0 0 3px rgba(255, 207, 0, 0.25);
+    border-color: var(--kf-yellow);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--kf-yellow) 25%, transparent);
 }
 
 /* Modern browsers: suppress focus ring on mouse click, keep for keyboard */
@@ -94,7 +108,7 @@
 .kontakt-form__textarea:focus:not(:focus-visible) {
     outline: none;
     box-shadow: none;
-    border-color: #e8e8e8;
+    border-color: var(--kf-border);
 }
 
 /* ----------------------------------------
@@ -133,7 +147,7 @@
     cursor: pointer;
     font-size: 1rem; /* 16px — Figma mobile body/meta */
     line-height: 1.375em;
-    color: #727272;
+    color: var(--kf-muted);
 }
 
 /* Visual box via ::before */
@@ -144,8 +158,8 @@
     width: 1.25rem;
     height: 1.25rem;
     margin-top: 0.05em;
-    background: #ffffff;
-    border: 1px solid #e8e8e8;
+    background: var(--kf-white);
+    border: 1px solid var(--kf-border);
     border-radius: 0.375rem;
     transition:
         background 0.15s ease,
@@ -155,8 +169,8 @@
 
 /* Checked — box fill + SVG checkmark */
 .kontakt-form__checkbox:checked + .kontakt-form__checkbox-label::before {
-    background-color: #ffcf00;
-    border-color: #ffcf00;
+    background-color: var(--kf-yellow);
+    border-color: var(--kf-yellow);
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 9' fill='none'%3E%3Cpath stroke='%23020202' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M1 4.5L4.5 8 11 1'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: center;
@@ -165,19 +179,19 @@
 
 /* Hover */
 .kontakt-form__checkbox:not(:disabled):hover + .kontakt-form__checkbox-label::before {
-    border-color: #a3a3a3;
+    border-color: var(--kf-border-hover);
 }
 
 /* Checked + hover */
 .kontakt-form__checkbox:checked:not(:disabled):hover + .kontakt-form__checkbox-label::before {
-    background-color: #ffcf00;
-    border-color: #a3a3a3;
+    background-color: var(--kf-yellow);
+    border-color: var(--kf-border-hover);
 }
 
 /* Focus — yellow for all browsers */
 .kontakt-form__checkbox:focus + .kontakt-form__checkbox-label::before {
-    outline: 2px solid #ffcf00;
-    box-shadow: 0 0 0 3px rgba(255, 207, 0, 0.25);
+    outline: 2px solid var(--kf-yellow);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--kf-yellow) 25%, transparent);
 }
 
 /* Modern browsers: suppress focus ring on mouse click, keep for keyboard */
@@ -197,15 +211,15 @@
    ---------------------------------------- */
 .kontakt-form__field--error .kontakt-form__input,
 .kontakt-form__field--error .kontakt-form__textarea {
-    border-color: #f00000;
+    border-color: var(--kf-error);
 }
 
 .kontakt-form__field--error .kontakt-form__checkbox-label::before {
-    border-color: #f00000;
+    border-color: var(--kf-error);
 }
 
 .kontakt-form__field--error .kontakt-form__checkbox:focus + .kontakt-form__checkbox-label::before {
-    outline-color: #ffcf00;
+    outline-color: var(--kf-yellow);
 }
 
 .kontakt-form__field--error .kontakt-form__checkbox:focus:not(:focus-visible) + .kontakt-form__checkbox-label::before {
@@ -215,7 +229,7 @@
 
 .kontakt-form__field-error {
     margin-top: 2px;
-    color: #f00000;
+    color: var(--kf-error);
     font-size: 1rem;
     font-weight: 500;
 }
@@ -228,7 +242,7 @@
     border: none;
     width: fit-content;
     display: inline-flex;
-    align-items: center;
+    align-items: stretch; /* pill and arrow circle are the same height */
     gap: 4px;
     padding: 0;
     background: transparent;
@@ -237,7 +251,7 @@
 }
 
 .kontakt-form__submit:focus {
-    outline: 2px solid #ffcf00;
+    outline: 2px solid var(--kf-yellow);
     outline-offset: 3px;
 }
 
@@ -246,10 +260,11 @@
 }
 
 .kontakt-form__submit-text {
-    color: #020202;
+    color: var(--kf-text);
     font-size: 1rem;
     font-weight: 600;
-    background-color: #ffcf00;
+    line-height: 1.375; /* 22px, button height 50px as in Figma */
+    background-color: var(--kf-yellow);
     padding: 0.875rem 1rem 0.875rem 2rem;
     border-top-left-radius: 0.625rem;
     border-bottom-left-radius: 0.625rem;
@@ -266,7 +281,7 @@
     align-items: center;
     flex-shrink: 0;
     padding: 1.2rem 1rem;
-    background-color: #ffcf00;
+    background-color: var(--kf-yellow);
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-top-right-radius: 0.625rem;
@@ -281,15 +296,18 @@
     width: 11px;
 }
 
-.kontakt-form__submit:hover .kontakt-form__submit-text {
-    border-top-right-radius: 2rem;
-    border-bottom-right-radius: 2rem;
-}
+/* Hover effect only where a real hover exists (no sticky hover after a tap on iPad) */
+@media (hover: hover) {
+    .kontakt-form__submit:hover .kontakt-form__submit-text {
+        border-top-right-radius: 2rem;
+        border-bottom-right-radius: 2rem;
+    }
 
-.kontakt-form__submit:hover .kontakt-form__submit-icon {
-    transform: translateX(4px);
-    border-top-left-radius: 2rem;
-    border-bottom-left-radius: 2rem;
+    .kontakt-form__submit:hover .kontakt-form__submit-icon {
+        transform: translateX(4px);
+        border-top-left-radius: 2rem;
+        border-bottom-left-radius: 2rem;
+    }
 }
 
 .kontakt-form__submit--disabled {
@@ -305,19 +323,19 @@
 }
 
 .kontakt-form__message {
-    color: #020202;
+    color: var(--kf-text);
     font-size: 1rem;
     font-weight: 500;
 }
 
 .kontakt-form__message--success {
-    color: #469b7c;
+    color: var(--kf-success);
     font-size: 1rem;
     font-weight: 500;
 }
 
 .kontakt-form__message--error {
-    color: #f00000;
+    color: var(--kf-error);
     font-size: 1rem;
     font-weight: 500;
 }
