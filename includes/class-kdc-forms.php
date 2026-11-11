@@ -246,7 +246,8 @@ class Kostaryka_Forms
                 "error" => "Nie udało się wysłać wiadomości. Spróbuj ponownie za chwilę.",
                 "network" => "Brak połączenia z serwerem. Sprawdź internet i spróbuj ponownie.",
                 "fixFields" => "Wypełnij poprawnie wszystkie wymagane pola.",
-                "captchaWait" => "Poczekaj chwilę na zakończenie weryfikacji i wyślij ponownie.",
+                "captchaConfirm" => "Potwierdź, że nie jesteś robotem, aby wysłać wiadomość.",
+                "captchaFailed" => "Nie udało się zweryfikować zabezpieczenia. Odśwież stronę i spróbuj ponownie.",
                 "required" => "To pole jest wymagane",
             ],
         ]);

@@ -24,100 +24,119 @@ export function msg(key, fallback) {
 
 /* ------------------------------------------------------------------
  * Turnstile
+ *
+ * The challenge starts only when the visitor presses "send" (never while the form is just
+ * displayed). The widget is "interaction-only": it stays invisible and takes no space, and
+ * appears above the submit button only if Cloudflare needs the visitor to confirm something.
  * ---------------------------------------------------------------- */
 
-const widgets = new WeakMap(); // slot element -> widget id
+const widgets = new WeakMap(); // slot element -> { id, token, waiters, onInteractive }
+const TOKEN_TIMEOUT_MS = 60000;
 
 function turnstileSlot(form) {
   return config().turnstileSiteKey ? form.querySelector('.kdc-turnstile') : null;
 }
 
-/**
- * Render the widget into the form's slot. Returns true when rendered (or not needed).
- */
-function renderTurnstile(form) {
-  const slot = turnstileSlot(form);
-  if (!slot) return true;
-  if (widgets.has(slot)) return true;
-  if (!window.turnstile) return false;
+function flush(state, token) {
+  const waiters = state.waiters.splice(0);
+  waiters.forEach((resolve) => resolve(token));
+}
 
-  // "interaction-only": the widget stays invisible and takes no space unless Cloudflare needs
-  // the visitor to confirm something (then the checkbox appears above the submit button).
-  const id = window.turnstile.render(slot, {
+/**
+ * Wait for api.js (loaded with defer) for up to 10 seconds.
+ * @returns {Promise<boolean>}
+ */
+function waitForApi() {
+  return new Promise((resolve) => {
+    let tries = 0;
+    const check = () => {
+      if (window.turnstile) return resolve(true);
+      if (++tries > 50) return resolve(false);
+      setTimeout(check, 200);
+    };
+    check();
+  });
+}
+
+function renderWidget(slot) {
+  const state = { id: null, token: '', waiters: [], onInteractive: null };
+
+  state.id = window.turnstile.render(slot, {
     sitekey: config().turnstileSiteKey,
     language: 'pl',
     theme: 'light',
     appearance: 'interaction-only',
-    'before-interactive-callback': () => slot.classList.add('is-interactive'),
+    callback: (token) => {
+      state.token = token;
+      flush(state, token);
+    },
+    'expired-callback': () => {
+      state.token = '';
+    },
+    'error-callback': () => {
+      state.token = '';
+      flush(state, '');
+    },
+    'timeout-callback': () => {
+      state.token = '';
+      flush(state, '');
+    },
+    'before-interactive-callback': () => {
+      slot.classList.add('is-interactive');
+      if (state.onInteractive) state.onInteractive();
+    },
     'after-interactive-callback': () => slot.classList.remove('is-interactive'),
   });
-  widgets.set(slot, id);
-  debugLog('Turnstile rendered', form.id);
-  return true;
-}
 
-/**
- * Lazy-render the widget when the form becomes visible (or gets focus), so forms that sit
- * in hidden containers (other breakpoint, closed popup) do not create widgets.
- * @param {HTMLFormElement} form
- */
-export function setupTurnstile(form) {
-  if (!turnstileSlot(form)) return;
-
-  const tryRender = (attempt = 0) => {
-    if (renderTurnstile(form)) return;
-    if (attempt < 50) setTimeout(() => tryRender(attempt + 1), 200); // wait for api.js (up to 10 s)
-  };
-
-  if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries.some((entry) => entry.isIntersecting)) {
-        observer.disconnect();
-        tryRender();
-      }
-    });
-    observer.observe(form); // the invisible widget has no area of its own
-  }
-  form.addEventListener('focusin', () => tryRender(), { once: true });
+  widgets.set(slot, state);
+  debugLog('Turnstile rendered', slot);
+  return state;
 }
 
 /**
  * @param {HTMLFormElement} form
- * @returns {boolean} true when the form has a widget
+ * @returns {boolean} true when the form has a Turnstile slot (keys are configured)
  */
 export function hasTurnstile(form) {
   return !!turnstileSlot(form);
 }
 
 /**
+ * Run the challenge and return the token ('' when it failed or timed out).
  * @param {HTMLFormElement} form
- * @returns {string} Turnstile token or ''
+ * @param {Function} [onInteractive] - called when the checkbox has to be shown
+ * @returns {Promise<string>}
  */
-export function getTurnstileToken(form) {
-  const field = form.querySelector('[name="cf-turnstile-response"]');
-  return field ? field.value : '';
+export async function requestTurnstileToken(form, onInteractive) {
+  const slot = turnstileSlot(form);
+  if (!slot) return '';
+  if (!(await waitForApi())) return '';
+
+  const state = widgets.get(slot) || renderWidget(slot);
+  state.onInteractive = onInteractive || null;
+  if (state.token) return state.token;
+
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(''), TOKEN_TIMEOUT_MS);
+    state.waiters.push((token) => {
+      clearTimeout(timer);
+      resolve(token);
+    });
+  });
 }
 
 /**
- * Ask for a fresh token (tokens are single-use).
+ * Tokens are single-use: drop the widget so the next submit starts a fresh challenge.
  * @param {HTMLFormElement} form
  */
 export function resetTurnstile(form) {
   const slot = turnstileSlot(form);
-  if (!slot) return;
-  if (!widgets.has(slot)) {
-    renderTurnstile(form);
-    return;
-  }
-  if (window.turnstile) window.turnstile.reset(widgets.get(slot));
-}
-
-/**
- * Make sure the widget exists (called on submit, in case it was not rendered yet).
- * @param {HTMLFormElement} form
- */
-export function ensureTurnstile(form) {
-  renderTurnstile(form);
+  if (!slot || !widgets.has(slot)) return;
+  const state = widgets.get(slot);
+  flush(state, '');
+  widgets.delete(slot);
+  slot.classList.remove('is-interactive');
+  if (window.turnstile) window.turnstile.remove(state.id);
 }
 
 /* ------------------------------------------------------------------

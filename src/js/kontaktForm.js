@@ -9,10 +9,8 @@ import {
   msg,
   postForm,
   setFieldError,
-  setupTurnstile,
-  ensureTurnstile,
   hasTurnstile,
-  getTurnstileToken,
+  requestTurnstileToken,
   resetTurnstile,
 } from './formApi.js';
 
@@ -106,9 +104,6 @@ function initFormInstance(wrapper) {
 
   let sending = false;
 
-  // Cloudflare Turnstile (only when keys are configured on the options page)
-  setupTurnstile(form);
-
   // Form submit handler
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -130,16 +125,26 @@ function initFormInstance(wrapper) {
       return;
     }
 
-    // Turnstile token must be ready (the widget solves itself in the background)
-    if (hasTurnstile(form) && !getTurnstileToken(form)) {
-      ensureTurnstile(form);
-      showMessage(messagesContainer, 'error', msg('captchaWait', 'Poczekaj chwilę na zakończenie weryfikacji i wyślij ponownie.'));
-      return;
-    }
-
     sending = true;
     submitBtn.disabled = true;
     submitBtn.classList.add('kontakt-form__submit--disabled');
+
+    // Cloudflare Turnstile (only when both keys are set on the options page): the challenge
+    // starts now and is invisible unless Cloudflare needs the visitor to confirm something.
+    if (hasTurnstile(form)) {
+      const token = await requestTurnstileToken(form, () =>
+        showMessage(messagesContainer, 'error', msg('captchaConfirm', 'Potwierdź, że nie jesteś robotem, aby wysłać wiadomość.'))
+      );
+      if (!token) {
+        showMessage(messagesContainer, 'error', msg('captchaFailed', 'Nie udało się zweryfikować zabezpieczenia. Odśwież stronę i spróbuj ponownie.'));
+        resetTurnstile(form);
+        sending = false;
+        submitBtn.disabled = false;
+        submitBtn.classList.remove('kontakt-form__submit--disabled');
+        return;
+      }
+      messagesContainer.innerHTML = '';
+    }
 
     const result = await postForm('kdc_contact_form', form);
 
@@ -165,7 +170,9 @@ function initFormInstance(wrapper) {
         const field = form.querySelector(`[name="${name}"]`);
         if (field) setFieldError(field, PREFIX, result.fields[name]);
       });
-      if (result.code === 'captcha') resetTurnstile(form);
+      // The token is single-use: after a captcha or server error ask for a new one
+      // (a plain field validation error leaves the token valid)
+      if (result.code === 'captcha' || !Object.keys(result.fields || {}).length) resetTurnstile(form);
     }
 
     sending = false;
