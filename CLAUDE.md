@@ -261,3 +261,18 @@ Mail delivery (not confirmed: a real submission on 2026-11-11 returned success, 
 - The banner has `z-index: 1000`, under the Breakdance popups (1050, mobile menu) and the lightbox (1100). A higher value covers the modal mobile menu and blocks its buttons. A saved "yes" without the flag `g` (given before a GA ID existed) is ignored once an ID is set.
 - Build: `npm run build`; the zip needs `dist/consent.js` and `dist/consent.css` as well as `includes/`.
 
+
+---
+
+## 🖱️ FEATURE: Global scrollbar (`scrollbar.css`)
+
+**Date:** 2026-11-11
+**Pages:** every public page
+**Status:** uploaded to the test server and reviewed read-only on 2026-11-11 (computed styles, 15 pages at 4 widths, no regressions). The look is not yet checked by eye on a real desktop browser. Full description, review and limits: root `docs/project/scrollbar.md`.
+**Files:** [`src/css/scrollbar.css`](src/css/scrollbar.css), [`src/js/scrollbar.js`](src/js/scrollbar.js) (CSS-only entry), third Vite entry `scrollbar` in [`vite.config.js`](vite.config.js) (output `dist/scrollbar.css`; `dist/scrollbar.js` is not loaded), `enqueue_global_styles()` in [`kostaryka-trip-map.php`](kostaryka-trip-map.php).
+
+- Applies only to devices with a mouse: `(hover: hover) and (pointer: fine) and (forced-colors: none)`. Phones and tablets keep their native overlay scrollbars.
+- `html { scrollbar-gutter: stable }` reserves the space, so `html.breakdance-noscroll` (set while a popup is open) does not shift the page.
+- Chrome, Edge, Safari: `::-webkit-scrollbar*` (10px bar, 6px thumb, palette colours). Firefox: `scrollbar-width` and `scrollbar-color` under `@supports (-moz-appearance: none)`. Do not set the standard properties globally: Chrome 121+ would then ignore `::-webkit-scrollbar` and the existing hidden scrollbars (Breakdance tabs list) would reappear.
+- Pure CSS on purpose: no JS scroll container, so sticky, ScrollTrigger and anchors stay untouched.
+- Build: `npm run build`; the zip needs `dist/scrollbar.css`.

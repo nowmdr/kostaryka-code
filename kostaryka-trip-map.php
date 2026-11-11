@@ -65,6 +65,9 @@ class Kostaryka_Trip_Map
      */
     private function init_hooks()
     {
+        // Globalny pasek przewijania (CSS na każdej stronie publicznej)
+        add_action("wp_enqueue_scripts", [$this, "enqueue_global_styles"], 5);
+
         // Podłączanie skryptów i stylów
         add_action("wp_enqueue_scripts", [$this, "enqueue_scripts"]);
 
@@ -101,6 +104,20 @@ class Kostaryka_Trip_Map
                 <p><strong>Kostaryka Trip Map:</strong> Plugin wymaga Advanced Custom Fields (ACF) Pro do działania.</p>
             </div>
             <?php }
+    }
+
+    /**
+     * Globalny pasek przewijania: sam CSS (dist/scrollbar.css), na każdej stronie publicznej.
+     * Plik dist/scrollbar.js nie jest ładowany (Vite potrzebuje go tylko jako punktu wejścia).
+     */
+    public function enqueue_global_styles()
+    {
+        wp_enqueue_style(
+            "kdc-scrollbar",
+            KOSTARYKA_TRIP_MAP_PLUGIN_URL . "dist/scrollbar.css",
+            [],
+            $this->asset_version("dist/scrollbar.css"),
+        );
     }
 
     /**

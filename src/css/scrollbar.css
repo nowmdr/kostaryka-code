@@ -1,0 +1,89 @@
+/**
+ * Kostaryka global scrollbar - loaded on every public page (dist/scrollbar.css).
+ *
+ * Scope: only devices with a mouse (hover + fine pointer). Phones and tablets keep their
+ * native overlay scrollbars, which are thin and take no space. High-contrast mode
+ * (forced-colors) keeps the system scrollbar.
+ *
+ * Pure CSS on purpose: no JS scroll container, so position: sticky, GSAP ScrollTrigger,
+ * anchors, the fixed header and Breakdance popups behave exactly as before.
+ *
+ * Engines:
+ *  - Chrome, Edge, Safari: ::-webkit-scrollbar (also gives a hover state).
+ *  - Firefox: scrollbar-width / scrollbar-color (it ignores the webkit pseudo-elements).
+ *  Chrome 121+ ignores ::-webkit-scrollbar once scrollbar-width / scrollbar-color is set, so the
+ *  standard properties are applied in Firefox only (@supports -moz-appearance).
+ *
+ * Existing rules that hide scrollbars (scrollbar-width: none, ::-webkit-scrollbar { display: none })
+ * are more specific than the global rules here and keep working.
+ */
+
+@media (hover: hover) and (pointer: fine) and (forced-colors: none) {
+  :root {
+    --kdc-sb-size: 10px;
+    /* palette: grey / text / surface; fallbacks match the values read on 2026-11-11 */
+    --kdc-sb-thumb: var(--bde-palette-color-1-f94b0eef-57d6-447b-ae19-c6e946a94277, #6d6968);
+    --kdc-sb-thumb-hover: var(--bde-palette-color-1-602433de-e175-4e7a-9497-7d71bea18f7b, #020202);
+    --kdc-sb-track-page: var(--bde-palette-color-1-ba1ce0c0-014e-436f-82db-2803db82cb51, #f6f7f7);
+  }
+
+  /*
+   * Reserve the page scrollbar space at all times. Breakdance sets
+   * `html.breakdance-noscroll { overflow: hidden }` while a popup is open; without a reserved
+   * gutter the page (and the fixed header) would jump sideways by the scrollbar width.
+   */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  /* Chrome, Edge, Safari */
+  *::-webkit-scrollbar {
+    width: var(--kdc-sb-size);
+    height: var(--kdc-sb-size);
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* The border makes the visible thumb thinner than the hit area (10px bar, 6px thumb). */
+  *::-webkit-scrollbar-thumb {
+    background-color: var(--kdc-sb-thumb);
+    background-clip: padding-box;
+    border: 2px solid transparent;
+    border-radius: 999px;
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover,
+  *::-webkit-scrollbar-thumb:active {
+    background-color: var(--kdc-sb-thumb-hover);
+  }
+
+  /* Page scrollbar: light track so the reserved gutter looks intentional next to full-bleed sections. */
+  html::-webkit-scrollbar-track {
+    background: var(--kdc-sb-track-page);
+  }
+
+  /* Firefox */
+  @supports (-moz-appearance: none) {
+    html {
+      scrollbar-width: thin;
+      scrollbar-color: var(--kdc-sb-thumb) var(--kdc-sb-track-page);
+    }
+
+    /* Inner scrollers: Firefox does not inherit scrollbar-width, but inherits scrollbar-color
+       and would paint the page track inside popups. Reset the track for them. */
+    .breakdance-popup-content,
+    .kdc-mm__screen,
+    textarea {
+      scrollbar-width: thin;
+      scrollbar-color: var(--kdc-sb-thumb) transparent;
+    }
+  }
+}

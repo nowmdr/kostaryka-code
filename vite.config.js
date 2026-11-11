@@ -14,7 +14,9 @@ export default defineConfig({
       input: {
         main: path.resolve(__dirname, 'src/js/main.js'),
         // Cookie consent: separate small bundle, loaded on every public page
-        consent: path.resolve(__dirname, 'src/js/consent.js')
+        consent: path.resolve(__dirname, 'src/js/consent.js'),
+        // Global scrollbar: CSS only, enqueued on every public page (JS output is not loaded)
+        scrollbar: path.resolve(__dirname, 'src/js/scrollbar.js')
       },
       output: {
         entryFileNames: '[name].js',
