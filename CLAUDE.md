@@ -230,3 +230,17 @@ Before this feature both front-end forms only validated the input and then faked
 
 ### Not tested yet
 Mail delivery (not confirmed: a real submission on 2026-11-11 returned success, but no mail arrived), the widget on the inline desktop-width form (the 2026-11-11 test was in the popup form, device not specified), the 429 response, the switch-off no-date case, the Reply-To header, and the ACF tabs (only the group registration was checked). Verified on 2026-11-11 in a desktop browser: Turnstile solve and success path. See root `docs/project/forms.md`, section "Test results (user, real browser, 2026-11-11)".
+
+---
+
+## 🎨 Kontakt form UI review (`/kontakt/`)
+
+**Date:** 2026-11-11
+**Files:** [`src/css/kontakt-form.css`](src/css/kontakt-form.css), [`src/js/kontaktForm.js`](src/js/kontaktForm.js), [`kostaryka-trip-map.php`](kostaryka-trip-map.php) (`render_kontakt_form`). Page-level changes (Breakdance post 680): root `docs/design/design-map.md`, section "Kontakt".
+**Status:** built with `npm run build` and uploaded by the user on 2026-11-11 ("seems to work", no detailed test reported).
+
+- Submit button: height 50px (`line-height: 1.375`, `align-items: stretch`); the hover effect is limited to `@media (hover: hover)` so it does not stick after a tap on iPad.
+- Busy state: `setSending()` in `kontaktForm.js` disables the button, shows "Wysyłanie…" (`kdcForms.messages.sending`, fallback in JS) and sets `aria-busy`.
+- Colours: local custom properties `--kf-*` on `.kontakt-form`. Brand colours use the Breakdance palette variables with the old hex as fallback; border, muted, error and success have no palette entry and stay as hex values.
+- `autocomplete="name"` and `autocomplete="email"` on the two inputs (Chrome issue "element doesn't have an autocomplete attribute").
+- Not changed: validation, Turnstile flow and the backend ([`includes/class-kdc-forms.php`](includes/class-kdc-forms.php)).
