@@ -258,5 +258,6 @@ Mail delivery (not confirmed: a real submission on 2026-11-11 returned success, 
 - ACF group "Cookies i analityka" on the options page "Ustawienia Globalne": GA measurement ID (or constant `KDC_GA_MEASUREMENT_ID`), the switch "show the banner without an ID" (not saved = on, temporary), banner title and banner text (empty = default text).
 - Reopen link: `<a href="#cookie-settings">` (in the Breakdance footer) or the shortcode `[kdc_cookie_settings]`.
 - **Rule for every standalone entry in this plugin: wrap the module body in an IIFE.** The built files are classic scripts that share one global scope with `dist/main.js`; unwrapped minified names (`t`, `e`) clash and the script silently stops ("Identifier 't' has already been declared"). This happened on the first upload.
+- The banner has `z-index: 1000`, under the Breakdance popups (1050, mobile menu) and the lightbox (1100). A higher value covers the modal mobile menu and blocks its buttons. A saved "yes" without the flag `g` (given before a GA ID existed) is ignored once an ID is set.
 - Build: `npm run build`; the zip needs `dist/consent.js` and `dist/consent.css` as well as `includes/`.
 

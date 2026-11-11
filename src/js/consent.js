@@ -24,7 +24,7 @@ const GA_ID_PATTERN = /^G-[A-Z0-9]{4,20}$/;
 
 let banner = null;
 let gaId = '';
-let state = null; // { v, analytics, t } or null = no decision yet
+let state = null; // { v, analytics, g, t } or null = no decision yet
 let analyticsLoaded = false;
 let lastTrigger = null;
 
@@ -45,7 +45,13 @@ function readConsent() {
 }
 
 function writeConsent(analytics) {
-  const data = { v: SCHEMA, analytics: analytics, t: Math.floor(Date.now() / 1000) };
+  // g = 1 when a real GA ID existed at that moment (a yes given before GA existed is not valid later)
+  const data = {
+    v: SCHEMA,
+    analytics: analytics,
+    g: GA_ID_PATTERN.test(gaId) ? 1 : 0,
+    t: Math.floor(Date.now() / 1000),
+  };
   let cookie =
     COOKIE_NAME + '=' + encodeURIComponent(JSON.stringify(data)) +
     '; Max-Age=' + MAX_AGE_SECONDS + '; Path=/; SameSite=Lax';
@@ -172,6 +178,8 @@ function init() {
   gaId = (banner.getAttribute('data-ga-id') || '').trim();
 
   state = readConsent();
+  // A "yes" saved while no GA ID existed (preview banner) must not switch GA on later.
+  if (state && state.analytics && !state.g && GA_ID_PATTERN.test(gaId)) state = null;
 
   if (state && state.analytics) {
     loadAnalytics();

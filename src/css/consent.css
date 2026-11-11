@@ -10,7 +10,9 @@
     --kdc-muted: #4a4a4a;
 
     position: fixed;
-    z-index: 99990;
+    /* Below the Breakdance popups (z-index 1050, e.g. the mobile menu) and the lightbox (1100):
+       a modal popup must stay fully usable; the banner is under it and returns when it closes. */
+    z-index: 1000;
     left: 14px;
     right: 14px;
     bottom: 14px;
